@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>A Data Harmonization Portal</title>
+		<link rel="stylesheet" type="text/css" href="index.css">
+		<script src='http://cdnjs.cloudflare.com/ajax/libs/d3/3.5.5/d3.min.js'></script>
+		<script type="text/javascript" src ="js/index_v.js"></script>
+		<script type="text/javascript" src ="js/index_g.js"></script>
+	</head>
+	<body>
+		<div>
+			<nav id="bar">
+				<ul>
+				  <li><a href="#">Upload meta-data(JSON)</a></li>
+				  <li><a href="#">Download meta-data(JSON)</a></li>
+				  <li><a href="#">Upload Variables(CSV)</a></li>
+				</ul>
+			</nav>
+		</div>
+	
+		<div id="body">
+			<div class="panels" id="groups">
+				<!--<svg height="100%" width="100%">
+					<circle cx="50%" cy="50%" r="160" fill="#33bbff" />
+					<text x="50%" y="50%">Group 1</text>
+				</svg>-->
+			</div>
+			
+			<div class="panels" id="variables" align="center">
+				<nav id="varbar">
+					<ul>
+						<li id="selected"><a href="#">All Variables</a></li>
+						<li><a href="#">Uploaded</a></li>
+						<li><a href="#">New</a></li>
+					</ul>
+				</nav>
+				<table id="table">
+				  <tr id="title">
+					<th>Code</th>
+					<th>Label</th> 
+					<th>Type</th>
+					<th>Methology</th>
+					<th>Description</th>
+				  </tr>
+				</table>
+				<p id="data">No Data.</p>
+			</div>
+			
+			<div class="panels" id="insert_group">
+				<form id="formG">
+				<fieldset>
+					<legend><strong>Selected Group</strong></legend>
+					Code: <input class="groups" type="text"><br><br>
+					Label: <input class="groups" type="text"><br><br>
+					Parent: <select  id="select" class="groups"><option value="none">None</option></select><br><br>
+					Description: <textarea rows="5"  class="groups"></textarea><br><br><br><br><br><br><br>
+					<button class="field_buttons" id="delG" type="button" disabled>Delete</button>
+					<button class="field_buttons" id="saveG" type="button">Save</button>
+				</fieldset>
+				</form>
+			</div>
+			
+			<div class="panels" id="insert_var">
+				<form id="formV" onchange="changeAttr()">
+				<fieldset>
+					<legend><strong>Selected Variable</strong></legend>
+					Code: <input class="vars" type="text"><br><br>
+					Label: <input class="vars" type="text"><br><br>
+					Type: <select class="vars">
+							<option selected value="Polynominal">Polynominal</option>
+							<option value="Binominal">Binominal</option>
+							<option value="Real">Real</option>
+						  </select><br><br>
+					Group: <select id="select2" class="vars"></select><br><br>
+					Description: <textarea rows="5" class="vars"></textarea><br><br><br><br><br><br>
+					Methodology: <input class="vars" type="text"><br><br><br>
+					<button class="field_buttons" id="delV" type="button" disabled>Delete</button>
+					<button class="field_buttons" id="saveV" type="button">Save</button>
+				</fieldset>
+				</form>
+			</div>
+		</div>   
+	</body>
+</html>
