@@ -16,8 +16,7 @@ var init = true;
 var svg;
 var pack;
 var color;
-var margin = 20,
-	padding = 2,
+var	padding = 2,
 	diameter = 350;
 function initializeSVG(){
 	svg = d3.select("#groups").append("svg")
@@ -25,13 +24,6 @@ function initializeSVG(){
 			.attr("height", diameter)
 			.append("g")
 			.attr("transform", "translate(" + diameter / 2 + "," + diameter / 2 + ")");
-
-	/*d3.select("#groups")
-			.on("click", function() {
-					zoom(root);
-			});
-
-	zoomTo([root.x, root.y, root.r * 2 + margin]);*/
 }
 
 /*
@@ -39,7 +31,7 @@ function initializeSVG(){
 */
 
 var currentRow;
-var flag = false; //manages if the "save" action comes from updated variable or a new one
+var flagV = false; //manages if the "save" action comes from updated variable or a new one
 function deleteV(){
 	if (confirm("Are you sure you want to delete this variable?")) {
 		var columns = document.getElementById("table").deleteRow(currentRow);
@@ -52,11 +44,11 @@ function deleteV(){
 		document.querySelector("#saveV").disabled = false;
 		document.querySelector("#delV").disabled = true;
 	}
-	flag=false;
+	flagV=false;
 }
 
 function saveV(){
-	if(flag){ //if you need to edit variable, delete the old, then add the new
+	if(flagV){ //if you need to edit variable, delete the old, then add the new
 		editV();
 	}
 	var new_vars = document.querySelectorAll(".vars");
@@ -98,15 +90,15 @@ function editV(){
 }
 
 //enables the save button if there is any change in the form
-function changeAttr(){
-	if(flag){
+function changeAttrV(){
+	if(flagV){
 		document.querySelector("#saveV").disabled = false;
 	}
 }
 
 //if a variable is clicked, fill the form below
 function fillformV(e){
-	flag=true;
+	flagV=true;
 	var num = document.getElementById("table").rows.length;	
 	var index = e.target.parentElement.rowIndex;
 	currentRow = index;
@@ -138,63 +130,169 @@ function highlight(){
 	GROUP FUNCTIONS
 */
 
-function deleteG(str){
-	/*
-		DELETE ALL VARIABLES OF THIS GROUP
-		delete from codes[]
-		change JSON obj
-	*/
-	alert("deleteG");
+var flagG = false;
+function changeAttrG(){
+	if(flagG){
+		document.querySelector("#saveG").disabled = false;
+	}
 }
 
-function saveG(){
-	var groups = document.querySelectorAll(".groups");
-	//if the "code" already exists don't add that group
-	if(if_exists(groups[0].value)){
-		if(confirm("The group with the code "+groups[0].value+" already exists. Are you sure you want to save the changes?")){
-			/*
-				TODO: 
-				1. find the group
-				2. change the attr in JSON
-			*/
-			alert("TO DO");
+function deleteG(){
+	if (confirm("Are you sure you want to delete this variable?")) {
+		for(var i = 0; i < codes.length;i++){
+			if(codes[i] == selected.code){ //the node we want to delete
+				codes.splice(i, 1);
+				break;
+			}
 		}
-	}else{
-		codes.push(groups[0].value);
-		var node = {
+		var found = find_parent(JSONobj,selected);
+		if(found){
+			for(var i = 0; i < found.children.length;i++){
+				if(found.children[i].code == selected.code){ //we found the child we should delete;
+					found.children.splice(i, 1);
+					break;
+				}
+			}
+		}else{ //is a root element
+			for(var i = 0; i < JSONobj.length;i++){
+				if(JSONobj[i].code == selected.code){ //we found the child we should delete
+					JSONobj.splice(i, 1);
+					break;
+				}
+			}
+		}
+		delete_option("select",selected.label);
+		delete_option("select2",selected.label);	
+	}
+	draw();
+}
+
+var selected;
+function fillformG(d){
+	flagG = true;
+	var groups = document.querySelectorAll(".groups");
+	groups[0].value = d.code;
+	groups[1].value = d.label;
+	if(d.parent.label=="")
+		groups[2].value = "None";
+	else
+		groups[2].value = d.parent.label;
+	groups[3].value = d.description;
+	selected = {
 			"code" : groups[0].value,
 			"label" : groups[1].value,
 			"parent" : groups[2].value,
 			"description" : groups[3].value,
-			"children" : []
+			"children" : [{}]
 		};
-		if(groups[2].value == "none"){
-			JSONobj.push(node);	
-		}else{
-			var found = find_parent(JSONobj,node);
-			found.children.push(node);
-		}
-		
-		draw();
-		add_option("select",groups[1].value);
-		add_option("select2",groups[1].value);
-		document.getElementById("formG").reset();
-	}
+	document.querySelector("#saveG").disabled = true;
+	document.querySelector("#delG").disabled = false;
 }
 
+function editG(){
+	flag = false;
+	var groups = document.querySelectorAll(".groups");
+	var node = {
+		"code" : groups[0].value,
+		"label" : groups[1].value,
+		"parent" : groups[2].value,
+		"description" : groups[3].value
+	};			
+	var found = find_parent(JSONobj,selected);
+	if(!found){ //and the parent is the root
+		for(var i = 0; i < JSONobj.length;i++){
+			if(JSONobj[i].code == selected.code){ //we found the child we should delete
+				node.children = [];
+				node.children = JSONobj[i].children;
+				JSONobj.splice(i, 1);
+				break;
+			}
+		}
+		found = find_parent(JSONobj,node); //search the new parent and insert the edited node
+		found.children.push(node);
+		if(JSON.stringify(found.children[0], null, ' ')=="{}")
+			found.children.splice(0, 1);
+	}else{ //if the parent is a node
+		for(var i = 0; i < found.children.length;i++){
+			if(found.children[i].code == selected.code){ //we found the child we should delete
+				node.children = [];
+				node.children = found.children[i].children;
+				found.children.splice(i, 1);
+				break;
+			}
+		}
+		found = find_parent(JSONobj,node); //search the parent and insert the edited node
+		if(found){
+			found.children.push(node);
+			if(JSON.stringify(found.children[0], null, ' ')=="{}")
+				found.children.splice(0, 1);
+		}else{
+			JSONobj.push(node);
+		}
+	}
+	delete_option("select",selected.label);
+	delete_option("select2",selected.label);
+}
+
+function saveG(){
+	var groups = document.querySelectorAll(".groups");
+	if(flagG){ //if you need to edit a group
+		if(confirm("Are you sure you want to edit this group?")){
+			editG();
+		}else return;	
+	}else{
+		//if the "code" already exists don't add that group
+		if(if_exists(groups[0].value)){
+			alert("The group with the code "+groups[0].value+" already exists.");
+		}else{
+			codes.push(groups[0].value);
+			var node = {
+				"code" : groups[0].value,
+				"label" : groups[1].value,
+				"parent" : groups[2].value,
+				"description" : groups[3].value,
+				"children" : [{}]
+			};
+			if(groups[2].value == "none"){
+				JSONobj.push(node);	
+			}else{
+				var found = find_parent(JSONobj,node);
+				found.children.push(node);
+				if(JSON.stringify(found.children[0], null, ' ')=="{}")
+					found.children.splice(0, 1);
+			}
+		}
+	}
+	draw();
+	add_option("select",groups[1].value);
+	add_option("select2",groups[1].value);
+	document.getElementById("formG").reset();
+}
+
+var circle;
+var focus;
+var text;
 function draw(){
 	var str = JSON.stringify(JSONobj, null, ' '); 
 	var new_str = "{ \"label\": \"none\", \"children\":" + str +"}";
 	var json = JSON.parse(new_str);
-	console.log(json);
 	//json = flareData();
+	//alert(JSON.stringify(json, null, ' ')); 
 	
-	color = d3.scale.linear()
+	svg.selectAll("circle").remove();
+	svg.selectAll("text").remove();
+	
+	d3.select("#groups")
+			.on("click", function() {
+					zoom(json);
+			});
+	
+	var color = d3.scale.linear()
 		.domain([0, tree_length(json)])
 		.range(["hsl(152,80%,80%)", "hsl(228,30%,40%)"])
 		.interpolate(d3.interpolateHcl);
 
-	pack = d3.layout.pack()
+	var pack = d3.layout.pack()
 			.padding(padding)
 			.size([diameter, diameter])
 			.value(function(d) {
@@ -202,34 +300,77 @@ function draw(){
 				return 100;
 			});
 	
+	focus = json;
 	var nodes = pack.nodes(json);
-	var circle = svg.selectAll("circle")
+	circle = svg.selectAll("circle")
 			.data(nodes)
 			.enter().append("circle")
 			.attr("class", function(d) {
-					return d.parent ? d.children ? "node" : "node node--leaf" : "node node--root";
+					if(d.parent){
+						if(d.children)
+							return "node";
+						else
+							return "node node--leaf";
+					}else{
+						return "node node--root";
+					}
 			})
 			.style("fill", function(d) {
-					return d.children ? color(d.depth) : null;
+				//return color(d.depth);
+				return d.children ? color(d.depth) : null;
 			})
+			.style("stroke", "gray")
 			.on("click", function(d) {
-					alert("JI");
-					//if (focus !== d) zoom(d), d3.event.stopPropagation();
+					if (focus !== d) fillformG(d) , zoom(d), d3.event.stopPropagation();
 			});
 
-	var text = svg.selectAll("text")
+	text = svg.selectAll("text")
 			.data(nodes)
 			.enter().append("text")
 			.attr("class", "label")
-			.style("fill-opacity", function(d) {
-					return d.parent === json ? 1 : 0;
-			})
 			.style("display", function(d) {
 					return d.parent === json ? null : "none";
 			})
 			.text(function(d) {
 					return d.label;
 			});
+			
+	zoomTo([json.x, json.y, json.r * 2]);
+}
+
+var view;
+function zoomTo(v) {
+	var node = svg.selectAll("circle,text");
+	var k = diameter / v[2];
+	view = v;
+	node.attr("transform", function(d) {
+			return "translate(" + (d.x - v[0]) + "," + (d.y - v[1])  + ")";
+	});
+	circle.attr("r", function(d) {
+			return d.r * k;
+	});
+}
+
+function zoom(d) {
+		focus = d;
+		var transition = d3.transition()
+				.duration(d3.event.altKey ? 5000 : 750)
+				.tween("zoom", function(d) {
+						var i = d3.interpolateZoom(view, [focus.x, focus.y, focus.r * 2]);
+						return function(t) {
+								zoomTo(i(t));
+						};
+				});
+		transition.selectAll("text")
+				.filter(function(d) {
+						return d.parent === focus || this.style.display === "inline";
+				})
+				.each("start", function(d) {
+						if (d.parent === focus) this.style.display = "inline";
+				})
+				.each("end", function(d) {
+						if (d.parent !== focus) this.style.display = "none";
+				});
 }
 
 //find the parent that has to add the new child
@@ -274,31 +415,11 @@ function add_option(id,option_name) {
 	document.getElementById(id).options[length] = new Option(option_name, option_name);
 }
 
-function flareData() {
-		return {
-			"label": "analytics",
-			"children": [
-					{						
-						"label": "cluster",
-						"children": [{
-								"label": "AgglomerativeCluster"
-						}, {
-								"label": "CommunityStructure"
-						}, {
-								"label": "HierarchicalCluster"
-						}, {
-								"label": "MergeEdge"
-						}]
-					},
-					{
-						"label": "whatever",
-						"children": [{
-								"label": "lalala"
-						}, {
-								"label": "CommunityStructure"
-							}
-						]
-					}
-			]
-		};
+function delete_option(id,option_name){
+	var length = document.getElementById(id).length;
+	for (var i=0; i < length ; i++){
+		if (document.getElementById(id).options[i].text == option_name)
+			document.getElementById(id).remove(i);
+			break;
+	}
 }
