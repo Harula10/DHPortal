@@ -117,6 +117,7 @@ nav a {
 nav li:hover a {
 	background: #e6e6e6;
 	color: black;
+	cursor: pointer;
 }
 
 #selected a {

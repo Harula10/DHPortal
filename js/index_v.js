@@ -4,6 +4,10 @@ window.onload = function(){
 	x[1].addEventListener("click",saveG);
 	x[2].addEventListener("click",deleteV);
 	x[3].addEventListener("click",saveV);
+	var li = document.querySelectorAll("#varbar > ul > li");
+	for(var i = 0; i < li.length; i++){
+		li[i].addEventListener("click",select_tab);
+	}
 	initializeSVG();
 };
 
@@ -44,6 +48,7 @@ function deleteV(){
 		document.querySelector("#saveV").disabled = false;
 		document.querySelector("#delV").disabled = true;
 	}
+	draw();
 	flagV=false;
 }
 
@@ -58,12 +63,31 @@ function saveV(){
 		document.getElementById("data").style.visibility = "hidden";
 		var table = document.querySelector("#table");	
 		var tr = document.createElement("tr");
-		tr.setAttribute("id", "new");
+		tr.setAttribute("id", new_vars[3].value); //group as row id
+		tr.setAttribute("class", "new"); //not uploaded ones
 		for(var i = 0; i < 3; i++){
 			var td = document.createElement("td");
 			td.innerHTML = new_vars[i].value;
 			tr.appendChild(td);
 		}	
+		//add var into a group
+		var group = search(JSONobj,new_vars[3].value,false);
+		if(group){
+			alert(JSON.stringify(group,null,' '));
+			var variable = {
+				"code" : new_vars[0].value,
+				"label" : new_vars[1].value,
+				"type" : new_vars[2].value,
+				"group" : new_vars[3].value,
+				"description" : new_vars[4].value,
+				"methology" : new_vars[5].value
+			};
+			if(JSON.stringify(group.children[0], null, ' ')=="{}")
+				group.children.splice(0, 1);
+			group.children.push(variable);
+			draw();
+		}
+		
 		var td = document.createElement("td");
 		td.innerHTML = new_vars[5].value;
 		tr.appendChild(td);
@@ -109,9 +133,7 @@ function fillformV(e){
 	for(var i = 0; i < 3; i++){
 		vars[i].value = columns[i].innerHTML;
 	}	
-	/*
-		ΠΡΕΠΕΙ ΝΑ ΣΥΜΠΛΗΡΩΝΕΙ ΚΑΙ ΤΟ ΓΚΡΟΥΠ
-	**/
+	vars[3].value = document.getElementById("table").rows[index].id;
 	vars[4].value = columns[4].innerHTML;
 	vars[5].value = columns[3].innerHTML;	
 	
@@ -145,7 +167,7 @@ function deleteG(){
 				break;
 			}
 		}
-		var found = find_parent(JSONobj,selected);
+		var found = search(JSONobj,selected,true);
 		if(found){
 			for(var i = 0; i < found.children.length;i++){
 				if(found.children[i].code == selected.code){ //we found the child we should delete;
@@ -190,7 +212,6 @@ function fillformG(d){
 }
 
 function editG(){
-	flag = false;
 	var groups = document.querySelectorAll(".groups");
 	var node = {
 		"code" : groups[0].value,
@@ -198,8 +219,8 @@ function editG(){
 		"parent" : groups[2].value,
 		"description" : groups[3].value
 	};			
-	var found = find_parent(JSONobj,selected);
-	if(!found){ //and the parent is the root
+	var found = search(JSONobj,selected,true);
+	if(!found){ //if the parent is the root
 		for(var i = 0; i < JSONobj.length;i++){
 			if(JSONobj[i].code == selected.code){ //we found the child we should delete
 				node.children = [];
@@ -208,7 +229,7 @@ function editG(){
 				break;
 			}
 		}
-		found = find_parent(JSONobj,node); //search the new parent and insert the edited node
+		found = search(JSONobj,node,true); //search the new parent and insert the edited node
 		found.children.push(node);
 		if(JSON.stringify(found.children[0], null, ' ')=="{}")
 			found.children.splice(0, 1);
@@ -221,7 +242,7 @@ function editG(){
 				break;
 			}
 		}
-		found = find_parent(JSONobj,node); //search the parent and insert the edited node
+		found = search(JSONobj,node,true); //search the parent and insert the edited node
 		if(found){
 			found.children.push(node);
 			if(JSON.stringify(found.children[0], null, ' ')=="{}")
@@ -232,6 +253,7 @@ function editG(){
 	}
 	delete_option("select",selected.label);
 	delete_option("select2",selected.label);
+	flag = false;
 }
 
 function saveG(){
@@ -239,7 +261,10 @@ function saveG(){
 	if(flagG){ //if you need to edit a group
 		if(confirm("Are you sure you want to edit this group?")){
 			editG();
-		}else return;	
+		}else{
+			document.getElementById("formG").reset();
+			return;	
+		}
 	}else{
 		//if the "code" already exists don't add that group
 		if(if_exists(groups[0].value)){
@@ -256,16 +281,19 @@ function saveG(){
 			if(groups[2].value == "none"){
 				JSONobj.push(node);	
 			}else{
-				var found = find_parent(JSONobj,node);
+				var found = search(JSONobj,node,true);
 				found.children.push(node);
-				if(JSON.stringify(found.children[0], null, ' ')=="{}")
+				if(JSON.stringify(found.children[0], null, ' ')=="{}"){
 					found.children.splice(0, 1);
+					delete_option("select2",groups[2].value);
+				}
 			}
 		}
 	}
 	draw();
 	add_option("select",groups[1].value);
 	add_option("select2",groups[1].value);
+	
 	document.getElementById("formG").reset();
 }
 
@@ -276,8 +304,6 @@ function draw(){
 	var str = JSON.stringify(JSONobj, null, ' '); 
 	var new_str = "{ \"label\": \"none\", \"children\":" + str +"}";
 	var json = JSON.parse(new_str);
-	//json = flareData();
-	//alert(JSON.stringify(json, null, ' ')); 
 	
 	svg.selectAll("circle").remove();
 	svg.selectAll("text").remove();
@@ -296,12 +322,12 @@ function draw(){
 			.padding(padding)
 			.size([diameter, diameter])
 			.value(function(d) {
-					//return d.size;
 				return 100;
 			});
-	
+
 	focus = json;
 	var nodes = pack.nodes(json);
+	
 	circle = svg.selectAll("circle")
 			.data(nodes)
 			.enter().append("circle")
@@ -316,14 +342,15 @@ function draw(){
 					}
 			})
 			.style("fill", function(d) {
-				//return color(d.depth);
 				return d.children ? color(d.depth) : null;
 			})
 			.style("stroke", "gray")
 			.on("click", function(d) {
 					if (focus !== d) fillformG(d) , zoom(d), d3.event.stopPropagation();
 			});
-
+			
+	console.log(circle);
+	
 	text = svg.selectAll("text")
 			.data(nodes)
 			.enter().append("text")
@@ -334,16 +361,19 @@ function draw(){
 			.text(function(d) {
 					return d.label;
 			});
-			
+		
+	//set the circle attributes each time
 	zoomTo([json.x, json.y, json.r * 2]);
 }
 
 var view;
 function zoomTo(v) {
 	var node = svg.selectAll("circle,text");
+	console.log(node);
 	var k = diameter / v[2];
 	view = v;
 	node.attr("transform", function(d) {
+			//alert(d.x+"-"+v[0]+","+d.y+"-"+v[1]);
 			return "translate(" + (d.x - v[0]) + "," + (d.y - v[1])  + ")";
 	});
 	circle.attr("r", function(d) {
@@ -373,14 +403,22 @@ function zoom(d) {
 				});
 }
 
-//find the parent that has to add the new child
-function find_parent(json,new_child){
+//find the parent that has to add the new child if f = true
+//find the group that has to add the var if f=false
+function search(json,_node,_flag){
 	for (obj in json){
         var node = json[obj]; 
-        if (node.label == new_child.parent)
-            return node;
+		if(_flag){
+			if (node.label == _node.parent){
+				return node;
+			}
+		}else{
+			if (node.label == _node){
+				return node;
+			}
+		}
         if (node.children){
-            var sub_json = find_parent(node.children,new_child);
+            var sub_json = search(node.children,_node);
             if (sub_json)
                 return sub_json;
         }
@@ -421,5 +459,22 @@ function delete_option(id,option_name){
 		if (document.getElementById(id).options[i].text == option_name)
 			document.getElementById(id).remove(i);
 			break;
+	}
+}
+
+function select_tab(e){
+	var li = document.querySelectorAll("#varbar > ul > li");
+	for(var i = 0; i < li.length; i++){
+		li[i].removeAttribute("id");
+	}
+	e.target.parentElement.setAttribute("id","selected");
+	if(e.target.innerHTML=="new"){
+		//select all the TR elements and add display:none
+		//to those with id="uploaded"
+	}else if(e.target.innerHTML=="uploaded"){
+		//select all the TR elements and add display:none
+		//to those with id="new"
+	}else{
+		//display all
 	}
 }
