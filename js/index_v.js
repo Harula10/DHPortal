@@ -72,7 +72,6 @@ function saveV(){
 		//add var into a group
 		var group = search(JSONobj,new_vars[3].value,false);
 		if(group){
-			alert(JSON.stringify(group,null,' '));
 			var variable = {
 				"code" : new_vars[0].value,
 				"label" : new_vars[1].value,
@@ -190,7 +189,7 @@ function deleteG(){
 
 var selected;
 function fillformG(d){
-	flagG = true;
+	flagG = false;
 	var groups = document.querySelectorAll(".groups");
 	groups[0].value = d.code;
 	groups[1].value = d.label;
@@ -307,16 +306,16 @@ function draw(){
 	svg.selectAll("circle").remove();
 	svg.selectAll("text").remove();
 	
-	d3.select("#groups")
-			.on("click", function() {
-					zoom(json);
-			});
-	
 	var color = d3.scale.linear()
 		.domain([0, tree_length(json)])
 		.range(["hsl(152,80%,80%)", "hsl(228,30%,40%)"])
 		.interpolate(d3.interpolateHcl);
 
+	d3.select("#groups")//.style("background", color(-1))
+			.on("click", function() {
+					zoom(json);
+			});
+		
 	var pack = d3.layout.pack()
 			.padding(2)
 			.size([diameter, diameter])
@@ -368,7 +367,6 @@ function draw(){
 var view;
 function zoomTo(v) {
 	var node = svg.selectAll("circle,text");
-	console.log(node);
 	var k = diameter / v[2];
 	view = v;
 	node.attr("transform", function(d) {
@@ -380,29 +378,28 @@ function zoomTo(v) {
 }
 
 function zoom(d) {
-		var focus0 = focus;
-		focus = d;
-		var transition = d3.transition()
-				.duration(d3.event.altKey ? 5000 : 750)
-				.tween("zoom", function(d) {
-						var i = d3.interpolateZoom(view, [focus.x, focus.y, focus.r * 2]);
-						return function(t) {
-								zoomTo(i(t));
-						};
-				});
-		transition.selectAll("text")
-				.filter(function(d) {
-						return d.parent === focus || this.style.display === "inline";
-				})
-				.style("fill-opacity", function(d) {
-				  return d.parent === focus ? 1 : 0;
-				})
-				.each("start", function(d) {
-						if (d.parent === focus) this.style.display = "inline";
-				})
-				.each("end", function(d) {
-						if (d.parent !== focus) this.style.display = "none";
-				});
+	focus = d;
+	var transition = d3.transition()
+			.duration(d3.event.altKey ? 5000 : 750)
+			.tween("zoom", function(d) {
+					var i = d3.interpolateZoom(view, [focus.x, focus.y, focus.r * 2]);
+					return function(t) {
+							zoomTo(i(t));
+					};
+			});
+	transition.selectAll("text")
+		.filter(function(d) {
+		  return d.parent === focus || this.style.display === "inline";
+		})
+		.style("fill-opacity", function(d) {
+		  return d.parent === focus ? 1 : 0;
+		})
+		.each("start", function(d) {
+		  if (d.parent === focus) this.style.display = "inline";
+		})
+		.each("end", function(d) {
+		  if (d.parent !== focus) this.style.display = "none";
+		});
 }
 
 //find the parent that has to add the new child if f = true
