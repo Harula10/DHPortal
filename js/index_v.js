@@ -20,8 +20,7 @@ var init = true;
 var svg;
 var pack;
 var color;
-var	padding = 2,
-	diameter = 350;
+var	diameter = 350;
 function initializeSVG(){
 	svg = d3.select("#groups").append("svg")
 			.attr("width", diameter)
@@ -319,7 +318,7 @@ function draw(){
 		.interpolate(d3.interpolateHcl);
 
 	var pack = d3.layout.pack()
-			.padding(padding)
+			.padding(2)
 			.size([diameter, diameter])
 			.value(function(d) {
 				return 100;
@@ -341,17 +340,11 @@ function draw(){
 						return "node node--root";
 					}
 			})
-			.attr("r", function(d) {
-				return d.r;
-			  })
-			.attr("id", function(d) {
-				return d.label;
-			})
 			.style("fill", function(d) {
-				return d.children ? color(d.depth) : null;
+				return d.children ? color(d.depth) : '#FFF';
 			})
 			.style("stroke", "gray")
-			.on("click", function(d) {
+			.on("click", function(d) { //if you find a var highligh it on list
 					if (focus !== d) fillformG(d) , zoom(d), d3.event.stopPropagation();
 			});
 	
@@ -362,10 +355,13 @@ function draw(){
 			.style("display", function(d) {
 					return d.parent === json ? null : "none";
 			})
+			.style("fill-opacity", function(d) {
+				return d.parent === json ? 1 : 0;
+			})
+			.style("font-size", "20px")
 			.text(function(d) {
 					return d.label;
 			});
-	//set the circle attributes each time
 	zoomTo([json.x, json.y, json.r * 2]);
 }
 
@@ -397,6 +393,9 @@ function zoom(d) {
 		transition.selectAll("text")
 				.filter(function(d) {
 						return d.parent === focus || this.style.display === "inline";
+				})
+				.style("fill-opacity", function(d) {
+				  return d.parent === focus ? 1 : 0;
 				})
 				.each("start", function(d) {
 						if (d.parent === focus) this.style.display = "inline";
