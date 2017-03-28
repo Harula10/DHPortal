@@ -324,7 +324,7 @@ function draw(){
 			.value(function(d) {
 				return 100;
 			});
-
+			
 	focus = json;
 	var nodes = pack.nodes(json);
 	
@@ -341,6 +341,12 @@ function draw(){
 						return "node node--root";
 					}
 			})
+			.attr("r", function(d) {
+				return d.r;
+			  })
+			.attr("id", function(d) {
+				return d.label;
+			})
 			.style("fill", function(d) {
 				return d.children ? color(d.depth) : null;
 			})
@@ -348,8 +354,6 @@ function draw(){
 			.on("click", function(d) {
 					if (focus !== d) fillformG(d) , zoom(d), d3.event.stopPropagation();
 			});
-			
-	console.log(circle);
 	
 	text = svg.selectAll("text")
 			.data(nodes)
@@ -361,7 +365,6 @@ function draw(){
 			.text(function(d) {
 					return d.label;
 			});
-		
 	//set the circle attributes each time
 	zoomTo([json.x, json.y, json.r * 2]);
 }
@@ -373,8 +376,7 @@ function zoomTo(v) {
 	var k = diameter / v[2];
 	view = v;
 	node.attr("transform", function(d) {
-			//alert(d.x+"-"+v[0]+","+d.y+"-"+v[1]);
-			return "translate(" + (d.x - v[0]) + "," + (d.y - v[1])  + ")";
+			return "translate(" + (d.x - v[0])*k + "," + (d.y - v[1])*k  + ")";
 	});
 	circle.attr("r", function(d) {
 			return d.r * k;
@@ -382,6 +384,7 @@ function zoomTo(v) {
 }
 
 function zoom(d) {
+		var focus0 = focus;
 		focus = d;
 		var transition = d3.transition()
 				.duration(d3.event.altKey ? 5000 : 750)
