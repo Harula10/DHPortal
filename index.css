@@ -61,6 +61,10 @@ textarea{
 	resize: none;
 }
 
+#resG,#resV{
+	float: left;
+}
+
 .field_buttons{
 	border-radius: 10px;	
 	background-color:  #b3e6ff;
@@ -97,6 +101,10 @@ nav li {
 	position: relative;
 	width: 33%;
 	transition: .2s;
+}
+
+#inputfile{
+    display: none;
 }
 
 nav a {

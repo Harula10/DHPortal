@@ -1,15 +1,18 @@
 window.onload = function(){
 	var x = document.querySelectorAll(".field_buttons");
-	x[0].addEventListener("click",deleteG);
-	x[1].addEventListener("click",saveG);
-	x[2].addEventListener("click",deleteV);
-	x[3].addEventListener("click",saveV);
+	x[0].addEventListener("click",resetG);
+	x[1].addEventListener("click",deleteG);
+	x[2].addEventListener("click",saveG);
+	x[3].addEventListener("click",resetV);
+	x[4].addEventListener("click",deleteV);
+	x[5].addEventListener("click",saveV);
 	var li = document.querySelectorAll("#varbar > ul > li");
 	for(var i = 0; i < li.length; i++){
 		li[i].addEventListener("click",select_tab);
 	}
 	initializeSVG();
 };
+
 
 /*
 	SVG INITIALIZER
@@ -30,6 +33,35 @@ function initializeSVG(){
 }
 
 /*
+	BUTTONS
+*/
+
+function downloadJSON(){
+	var data = "text/json;charset=utf-8," + encodeURIComponent(JSONobj);
+	event.target.href = 'data:' + data;
+	event.target.download = 'meta-data.json';
+}
+
+function uploadJSON(){
+	event.preventDefault();
+	document.getElementById("inputfile").click();
+	
+	var files = document.getElementById('inputfile').files;
+	console.log(files);
+	if (files.length <= 0) return;
+	
+	/*var fr = new FileReader();
+	fr.onload = function(e) { 
+		var result = JSON.parse(e.target.result);
+		var formatted = JSON.stringify(result, null, 2);
+		alert(formatted);
+	}*/
+
+	//fr.readAsText(files.item(0));
+	//JSONobj 
+}
+
+/*
 	VARIABLE FUNCTIONS
 */
 
@@ -46,14 +78,86 @@ function deleteV(){
 		document.getElementById("formV").reset();
 		document.querySelector("#saveV").disabled = false;
 		document.querySelector("#delV").disabled = true;
+		
+		var group = search(JSONobj,highlighted.group,false);
+		for(var i = 0; i < group.children.length;i++){
+			if(group.children[i].code == highlighted.code){ 
+				group.children.splice(i, 1);
+				break;
+			}
+		}
 	}
 	draw();
 	flagV=false;
 }
 
+var highlighted;
+function resetV(){
+	document.getElementById("formV").reset();
+	if(flagV){
+		document.querySelector("#saveV").disabled = false;
+		document.querySelector("#delV").disabled = true;
+	}
+	var row=document.getElementsByTagName("tr"); 
+	for(var i=1;i<row.length;i++)
+		row[i].className=''; 
+	flagV = false;
+}
+
+function resetG(){
+	document.getElementById("formG").reset();
+	if(flagG){
+		document.querySelector("#saveG").disabled = false;
+		document.querySelector("#delG").disabled = true;
+	}
+	if(document.getElementById("select").length > 1)
+		draw();
+	flagG = false;
+}
+
+function findVar(e){
+	var vars = document.querySelectorAll(".vars");
+	var table = document.getElementById("table");
+	for(var i = 1; i < table.rows.length; i++){
+		if(table.rows[i].cells[1].innerHTML==e.label){
+			for(var j = 0; j < 4; j++){
+				vars[0].value = table.rows[i].cells[0].innerHTML;
+				vars[1].value = table.rows[i].cells[1].innerHTML;
+				vars[2].value = table.rows[i].cells[2].innerHTML;
+				vars[3].value = table.rows[i].id;
+				vars[4].value = table.rows[i].cells[4].innerHTML;
+				vars[5].value = table.rows[i].cells[3].innerHTML;	
+			}
+			currentRow = i;
+			highlighted = {
+				"code" : vars[0].value,
+				"label" : vars[1].value,
+				"type" : vars[2].value,
+				"group" : vars[3].value,
+				"description" : vars[4].value,
+				"methodology" : vars[5].value
+			}
+			highlight();
+			break;
+		}			
+	}
+	flagV = true;
+	document.querySelector("#saveV").disabled = true;
+	document.querySelector("#delV").disabled = false;
+
+}
+
 function saveV(){
-	if(flagV){ //if you need to edit variable, delete the old, then add the new
-		editV();
+	if(flagV){
+		editV(); //deletes the old variable
+		//delete the old var from group
+		var group = search(JSONobj,highlighted.group,false);
+		for(var i = 0; i < group.children.length;i++){
+			if(group.children[i].code == highlighted.code){ 
+				group.children.splice(i, 1);
+				break;
+			}
+		}
 	}
 	var new_vars = document.querySelectorAll(".vars");
 	if(new_vars[3].value==""){
@@ -70,7 +174,7 @@ function saveV(){
 			tr.appendChild(td);
 		}	
 		//add var into a group
-		var group = search(JSONobj,new_vars[3].value,false);
+		group = search(JSONobj,new_vars[3].value,false);
 		if(group){
 			var variable = {
 				"code" : new_vars[0].value,
@@ -78,11 +182,12 @@ function saveV(){
 				"type" : new_vars[2].value,
 				"group" : new_vars[3].value,
 				"description" : new_vars[4].value,
-				"methology" : new_vars[5].value
+				"methodology" : new_vars[5].value
 			};
 			if(JSON.stringify(group.children[0], null, ' ')=="{}")
 				group.children.splice(0, 1);
 			group.children.push(variable);
+			
 			draw();
 		}
 		
@@ -108,7 +213,7 @@ function editV(){
 			document.getElementById("data").style.visibility = "visible";
 			currentRow == 1;
 		}
-	}
+	}else resetV();
 }
 
 //enables the save button if there is any change in the form
@@ -137,6 +242,14 @@ function fillformV(e){
 	
 	document.querySelector("#saveV").disabled = true;
 	document.querySelector("#delV").disabled = false;
+	highlighted = {
+		"code" : vars[0].value,
+		"label" : vars[1].value,
+		"type" : vars[2].value,
+		"group" : vars[3].value,
+		"description" : vars[4].value,
+		"methodology" : vars[5].value
+	}
 }
 
 function highlight(){
@@ -158,11 +271,20 @@ function changeAttrG(){
 }
 
 function deleteG(){
-	if (confirm("Are you sure you want to delete this variable?")) {
+	if (confirm("Are you sure you want to delete this group?")) {
 		for(var i = 0; i < codes.length;i++){
 			if(codes[i] == selected.code){ //the node we want to delete
 				codes.splice(i, 1);
 				break;
+			}
+		}
+		alert(selected.label);
+		var table = document.getElementById("table").rows;
+		for(var i = 1; i < table.length ; ){
+			if(table[i].id == selected.label){
+				table[i].remove();
+			}else{
+				i++;
 			}
 		}
 		var found = search(JSONobj,selected,true);
@@ -181,15 +303,17 @@ function deleteG(){
 				}
 			}
 		}
+		alert(selected.label);
 		delete_option("select",selected.label);
-		delete_option("select2",selected.label);	
+		delete_option("select2",selected.label);
+		document.getElementById("formG").reset();	
+		draw();
 	}
-	draw();
 }
 
 var selected;
 function fillformG(d){
-	flagG = false;
+	flagG = true;
 	var groups = document.querySelectorAll(".groups");
 	groups[0].value = d.code;
 	groups[1].value = d.label;
@@ -202,6 +326,7 @@ function fillformG(d){
 			"code" : groups[0].value,
 			"label" : groups[1].value,
 			"parent" : groups[2].value,
+			"class" : "group",
 			"description" : groups[3].value,
 			"children" : [{}]
 		};
@@ -221,32 +346,44 @@ function editG(){
 	if(!found){ //if the parent is the root
 		for(var i = 0; i < JSONobj.length;i++){
 			if(JSONobj[i].code == selected.code){ //we found the child we should delete
-				node.children = [];
-				node.children = JSONobj[i].children;
-				JSONobj.splice(i, 1);
+				if(JSONobj[i].parent == node.parent){
+					JSONobj[i].code = node.code;
+					JSONobj[i].label = node.label;
+					JSONobj[i].description = node.description;
+				}else{
+					node.children = [];
+					node.children = JSONobj[i].children.slice();
+					JSONobj.splice(i, 1);
+					found = search(JSONobj,node,true); //search the new parent and insert the edited node
+					found.children.push(node);
+					if(JSON.stringify(found.children[0], null, ' ')=="{}")
+						found.children.splice(0, 1);
+				}
 				break;
 			}
 		}
-		found = search(JSONobj,node,true); //search the new parent and insert the edited node
-		found.children.push(node);
-		if(JSON.stringify(found.children[0], null, ' ')=="{}")
-			found.children.splice(0, 1);
 	}else{ //if the parent is a node
 		for(var i = 0; i < found.children.length;i++){
 			if(found.children[i].code == selected.code){ //we found the child we should delete
-				node.children = [];
-				node.children = found.children[i].children;
-				found.children.splice(i, 1);
+				if(found.children[i].parent == node.parent){
+					found.children[i].code = node.code;
+					found.children[i].label = node.label;
+					found.children[i].description = node.description;
+				}else{
+					node.children = [];
+					node.children = found.children[i].children.slice();
+					found.children.splice(i, 1);
+					var par = search(JSONobj,node,true); //search the new parent and insert the edited node
+					if(par){
+						par.children.push(node);
+						if(JSON.stringify(par.children[0], null, ' ')=="{}")
+							par.children.splice(0, 1);
+					}else{
+						JSONobj.push(node);
+					}
+				}
 				break;
 			}
-		}
-		found = search(JSONobj,node,true); //search the parent and insert the edited node
-		if(found){
-			found.children.push(node);
-			if(JSON.stringify(found.children[0], null, ' ')=="{}")
-				found.children.splice(0, 1);
-		}else{
-			JSONobj.push(node);
 		}
 	}
 	delete_option("select",selected.label);
@@ -260,8 +397,8 @@ function saveG(){
 		if(confirm("Are you sure you want to edit this group?")){
 			editG();
 		}else{
-			document.getElementById("formG").reset();
-			return;	
+			resetG();
+			return;
 		}
 	}else{
 		//if the "code" already exists don't add that group
@@ -283,7 +420,6 @@ function saveG(){
 				found.children.push(node);
 				if(JSON.stringify(found.children[0], null, ' ')=="{}"){
 					found.children.splice(0, 1);
-					delete_option("select2",groups[2].value);
 				}
 			}
 		}
@@ -331,10 +467,10 @@ function draw(){
 			.enter().append("circle")
 			.attr("class", function(d) {
 					if(d.parent){
-						if(d.children)
+						//if(d.children)
 							return "node";
-						else
-							return "node node--leaf";
+						//else
+						//	return "node node--leaf";
 					}else{
 						return "node node--root";
 					}
@@ -343,8 +479,26 @@ function draw(){
 				return d.children ? color(d.depth) : '#FFF';
 			})
 			.style("stroke", "gray")
-			.on("click", function(d) { //if you find a var highligh it on list
-					if (focus !== d) fillformG(d) , zoom(d), d3.event.stopPropagation();
+			.text(function(d) {
+				return d.label;
+			})
+			.on("click", function(d) { 
+				if (focus !== d){	
+					//console.log(d.children);
+					if(d.children){
+						fillformG(d);
+						zoom(d);
+						d3.event.stopPropagation();
+					}else{
+						if(d.methodology !== undefined){ //if it is a variable
+							findVar(d);
+						}else{
+							fillformG(d.parent);
+							zoom(d);
+							d3.event.stopPropagation();
+						}
+					}
+				}
 			});
 	
 	text = svg.selectAll("text")
@@ -352,16 +506,17 @@ function draw(){
 			.enter().append("text")
 			.attr("class", "label")
 			.style("display", function(d) {
-					return d.parent === json ? null : "none";
+				return d.parent === json ? null : "none";
 			})
 			.style("fill-opacity", function(d) {
 				return d.parent === json ? 1 : 0;
 			})
 			.style("font-size", "20px")
 			.text(function(d) {
-					return d.label;
+				return d.label;
 			});
-	zoomTo([json.x, json.y, json.r * 2]);
+			
+	zoomTo([json.x, json.y, json.r * 2 + 80]);
 }
 
 var view;
@@ -379,27 +534,30 @@ function zoomTo(v) {
 
 function zoom(d) {
 	focus = d;
-	var transition = d3.transition()
-			.duration(d3.event.altKey ? 5000 : 750)
-			.tween("zoom", function(d) {
-					var i = d3.interpolateZoom(view, [focus.x, focus.y, focus.r * 2]);
-					return function(t) {
-							zoomTo(i(t));
-					};
+	console.log(d.children);
+	if(d.children){
+		var transition = d3.transition()
+				.duration(d3.event.altKey ? 5000 : 750)
+				.tween("zoom", function(d) {
+						var i = d3.interpolateZoom(view, [focus.x, focus.y, focus.r * 2 + 50]);
+						return function(t) {
+								zoomTo(i(t));
+						};
+				});
+		transition.selectAll("text")
+			.filter(function(d) {
+			  return d.parent === focus || this.style.display === "inline";
+			})
+			.style("fill-opacity", function(d) {
+			  return d.parent === focus ? 1 : 0;
+			})
+			.each("start", function(d) {
+			  if (d.parent === focus) this.style.display = "inline";
+			})
+			.each("end", function(d) {
+			  if (d.parent !== focus) this.style.display = "none";
 			});
-	transition.selectAll("text")
-		.filter(function(d) {
-		  return d.parent === focus || this.style.display === "inline";
-		})
-		.style("fill-opacity", function(d) {
-		  return d.parent === focus ? 1 : 0;
-		})
-		.each("start", function(d) {
-		  if (d.parent === focus) this.style.display = "inline";
-		})
-		.each("end", function(d) {
-		  if (d.parent !== focus) this.style.display = "none";
-		});
+	}
 }
 
 //find the parent that has to add the new child if f = true
@@ -453,11 +611,12 @@ function add_option(id,option_name) {
 }
 
 function delete_option(id,option_name){
-	var length = document.getElementById(id).length;
-	for (var i=0; i < length ; i++){
-		if (document.getElementById(id).options[i].text == option_name)
+	var length = document.getElementById(id).options.length;
+	for (var i = 0; i < length ; i++){
+		if (document.getElementById(id).options[i].text == option_name){
 			document.getElementById(id).remove(i);
 			break;
+		}
 	}
 }
 

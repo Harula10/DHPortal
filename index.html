@@ -13,9 +13,9 @@
 		<div>
 			<nav id="bar">
 				<ul>
-				  <li><a href="#">Upload meta-data(JSON)</a></li>
-				  <li><a href="#">Download meta-data(JSON)</a></li>
-				  <li><a href="#">Upload Variables(CSV)</a></li>
+				  <li><input type="file"  accept=".json" id="inputfile"/><a onclick="uploadJSON()">Upload meta-data(JSON)</a></li>
+				  <li><a onclick="downloadJSON()">Download meta-data(JSON)</a></li>
+				  <li><a onclick="uploadCSV()">Upload Variables(CSV)</a></li>
 				</ul>
 			</nav>
 		</div>
@@ -52,6 +52,7 @@
 					Label: <input class="groups" type="text"><br><br>
 					Parent: <select  id="select" class="groups"><option value="none">None</option></select><br><br>
 					Description: <textarea rows="5"  class="groups"></textarea><br><br><br><br><br><br><br>
+					<button class="field_buttons" id="resG" type="button">Reset</button>
 					<button class="field_buttons" id="delG" type="button" disabled>Delete</button>
 					<button class="field_buttons" id="saveG" type="button">Save</button>
 				</fieldset>
@@ -72,6 +73,7 @@
 					Group: <select id="select2" class="vars"></select><br><br>
 					Description: <textarea rows="5" class="vars"></textarea><br><br><br><br><br><br>
 					Methodology: <input class="vars" type="text"><br><br><br>
+					<button class="field_buttons" id="resV" type="button">Reset</button>
 					<button class="field_buttons" id="delV" type="button" disabled>Delete</button>
 					<button class="field_buttons" id="saveV" type="button">Save</button>
 				</fieldset>
