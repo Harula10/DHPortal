@@ -103,7 +103,7 @@ nav li {
 	transition: .2s;
 }
 
-#inputfile{
+#inputfile, #inputfilecsv{
     display: none;
 }
 

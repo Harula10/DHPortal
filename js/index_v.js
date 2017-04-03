@@ -37,28 +37,94 @@ function initializeSVG(){
 */
 
 function downloadJSON(){
-	var data = "text/json;charset=utf-8," + encodeURIComponent(JSONobj);
+	var data = "text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(JSONobj,null,' '));
 	event.target.href = 'data:' + data;
 	event.target.download = 'meta-data.json';
 }
 
 function uploadJSON(){
 	event.preventDefault();
-	document.getElementById("inputfile").click();
-	
-	var files = document.getElementById('inputfile').files;
-	console.log(files);
+	document.getElementById("inputfile").click();	
+}
+
+function uploadCSV(){
+	event.preventDefault();
+	document.getElementById("inputfilecsv").click();	
+}
+
+var vars = [];
+function getFile(event,id){
+	var files = document.getElementById(id).files;
 	if (files.length <= 0) return;
 	
-	/*var fr = new FileReader();
-	fr.onload = function(e) { 
-		var result = JSON.parse(e.target.result);
-		var formatted = JSON.stringify(result, null, 2);
-		alert(formatted);
-	}*/
+	var input = event.target;
+	var fr = new FileReader();
+	fr.onload = function() { 
+		if(id=='inputfile'){
+			var result = JSON.parse(fr.result);
+			var formatted = JSON.stringify(result, null, 2);
+			JSONobj = result;
+			//find all the variables
+			addVars(JSONobj);
+			draw();
+		}else{
+			//split each row of csv file
+			
+			//convert each row to JSON node
+			
+			//add it to vars[]
+		
+		}
+		//add vars to list
+		initVar(id);
+		
+	}
+	fr.readAsText(files.item(0));
+}
 
-	//fr.readAsText(files.item(0));
-	//JSONobj 
+function initVar(id){
+	document.getElementById("data").style.visibility = "hidden";
+	var table = document.querySelector("#table");	
+	for(var i = 0; i < vars.length; i++){
+		var tr = document.createElement("tr");
+		tr.setAttribute("id", vars[i].group); //group as row id
+		if(id=='inputfile'){
+			add_option("select",vars[i].group);
+			add_option("select2",vars[i].group);
+		}
+		tr.setAttribute("class", "uploaded"); //uploaded ones
+		
+		var td = document.createElement("td");
+		td.innerHTML = vars[i].code;
+		tr.appendChild(td);	
+		td = document.createElement("td");
+		td.innerHTML = vars[i].label;
+		tr.appendChild(td);	
+		td = document.createElement("td");
+		td.innerHTML = vars[i].type;
+		tr.appendChild(td);	
+		td = document.createElement("td");
+		td.innerHTML = vars[i].description;
+		tr.appendChild(td);	
+		td = document.createElement("td");
+		td.innerHTML = vars[i].methodology;
+		tr.appendChild(td);	
+
+		tr.addEventListener("click",fillformV);
+		table.appendChild(tr);
+	}
+}
+
+function addVars(json){
+	for (obj in json){
+        var node = json[obj]; 
+		if(node.methodology){
+			vars.push(node);
+		}
+        if (node.children){
+            var sub_json = addVars(node.children);
+        }
+    }
 }
 
 /*
@@ -83,6 +149,9 @@ function deleteV(){
 		for(var i = 0; i < group.children.length;i++){
 			if(group.children[i].code == highlighted.code){ 
 				group.children.splice(i, 1);
+				if(!group.children[0]){
+					group.children = [{}];
+				}
 				break;
 			}
 		}
@@ -278,7 +347,6 @@ function deleteG(){
 				break;
 			}
 		}
-		alert(selected.label);
 		var table = document.getElementById("table").rows;
 		for(var i = 1; i < table.length ; ){
 			if(table[i].id == selected.label){
@@ -303,7 +371,6 @@ function deleteG(){
 				}
 			}
 		}
-		alert(selected.label);
 		delete_option("select",selected.label);
 		delete_option("select2",selected.label);
 		document.getElementById("formG").reset();	
@@ -515,7 +582,7 @@ function draw(){
 			.text(function(d) {
 				return d.label;
 			});
-			
+	
 	zoomTo([json.x, json.y, json.r * 2 + 80]);
 }
 
@@ -534,7 +601,6 @@ function zoomTo(v) {
 
 function zoom(d) {
 	focus = d;
-	console.log(d.children);
 	if(d.children){
 		var transition = d3.transition()
 				.duration(d3.event.altKey ? 5000 : 750)
@@ -560,8 +626,8 @@ function zoom(d) {
 	}
 }
 
-//find the parent that has to add the new child if f = true
-//find the group that has to add the var if f=false
+//find the parent that has to add the new child (_node) if f = true
+//find the group that has to add the var (_node) if f=false
 function search(json,_node,_flag){
 	for (obj in json){
         var node = json[obj]; 
@@ -626,13 +692,19 @@ function select_tab(e){
 		li[i].removeAttribute("id");
 	}
 	e.target.parentElement.setAttribute("id","selected");
-	if(e.target.innerHTML=="new"){
-		//select all the TR elements and add display:none
-		//to those with id="uploaded"
-	}else if(e.target.innerHTML=="uploaded"){
-		//select all the TR elements and add display:none
-		//to those with id="new"
-	}else{
-		//display all
+	var tr = document.querySelectorAll("tr:not(#table)");
+	for(var i = 0; i<tr.length; i++){
+		tr[i].style.display = "table-row";
+	}
+	if(e.target.innerHTML=="New"){
+		var tr = document.getElementsByClassName("uploaded");
+		for(var i = 0; i<tr.length; i++){
+			tr[i].style.display = "none";
+		}
+	}else if(e.target.innerHTML=="Uploaded"){
+		var tr = document.getElementsByClassName("new");
+		for(var i = 0; i<tr.length; i++){
+			tr[i].style.display = "none";
+		}
 	}
 }
