@@ -168,8 +168,10 @@ function resetV(){
 		document.querySelector("#delV").disabled = true;
 	}
 	var row=document.getElementsByTagName("tr"); 
-	for(var i=1;i<row.length;i++)
-		row[i].className=''; 
+	for(var i=1;i<row.length;i++){
+		if(row[i].classList.contains('highlight'))
+			row[i].classList.remove('highlight'); 
+	}
 	flagV = false;
 }
 
@@ -256,7 +258,6 @@ function saveV(){
 			if(JSON.stringify(group.children[0], null, ' ')=="{}")
 				group.children.splice(0, 1);
 			group.children.push(variable);
-			
 			draw();
 		}
 		
@@ -323,9 +324,11 @@ function fillformV(e){
 
 function highlight(){
 	var row=document.getElementsByTagName("tr"); 
-	for(var i=1;i<row.length;i++)
-		row[i].className=''; 
-	document.getElementById("table").rows[currentRow].className="highlight";
+	for(var i=1;i<row.length;i++){
+		if(row[i].classList.contains('highlight'))
+			row[i].classList.remove('highlight'); 
+	}
+	document.getElementById("table").rows[currentRow].classList.add('highlight');
 }
 
 /*
@@ -384,16 +387,15 @@ function fillformG(d){
 	var groups = document.querySelectorAll(".groups");
 	groups[0].value = d.code;
 	groups[1].value = d.label;
-	if(d.parent.label=="")
+	if(d.parent==="none")
 		groups[2].value = "None";
 	else
-		groups[2].value = d.parent.label;
+		groups[2].value = d.parent;
 	groups[3].value = d.description;
 	selected = {
 			"code" : groups[0].value,
 			"label" : groups[1].value,
 			"parent" : groups[2].value,
-			"class" : "group",
 			"description" : groups[3].value,
 			"children" : [{}]
 		};
@@ -480,7 +482,7 @@ function saveG(){
 				"description" : groups[3].value,
 				"children" : [{}]
 			};
-			if(groups[2].value == "none"){
+			if(groups[2].value == "None"){
 				JSONobj.push(node);	
 			}else{
 				var found = search(JSONobj,node,true);
@@ -503,13 +505,13 @@ var focus;
 var text;
 function draw(){
 	var str = JSON.stringify(JSONobj, null, ' '); 
-	var new_str = "{ \"label\": \"none\", \"children\":" + str +"}";
+	var new_str = "{ \"label\": \"None\", \"children\":" + str +"}";
 	var json = JSON.parse(new_str);
 	
 	svg.selectAll("circle").remove();
 	svg.selectAll("text").remove();
 	
-	var color = d3.scale.linear()
+	var color = d3.scaleLinear()
 		.domain([0, tree_length(json)])
 		.range(["hsl(152,80%,80%)", "hsl(228,30%,40%)"])
 		.interpolate(d3.interpolateHcl);
@@ -519,15 +521,16 @@ function draw(){
 					zoom(json);
 			});
 		
-	var pack = d3.layout.pack()
-			.padding(2)
+	var pack = d3.pack()
 			.size([diameter, diameter])
-			.value(function(d) {
-				return 100;
-			});
-			
+			.padding(10);
+		
+	json = d3.hierarchy(json)
+      .sum(function(d) { return 100; })
+      .sort(function(a, b) { return b.value - a.value; });
+
 	focus = json;
-	var nodes = pack.nodes(json);
+	var nodes = pack(json).descendants();
 	
 	circle = svg.selectAll("circle")
 			.data(nodes)
@@ -551,20 +554,13 @@ function draw(){
 			})
 			.on("click", function(d) { 
 				if (focus !== d){	
-					//console.log(d.children);
-					if(d.children){
-						fillformG(d);
-						zoom(d);
-						d3.event.stopPropagation();
-					}else{
-						if(d.methodology !== undefined){ //if it is a variable
-							findVar(d);
-						}else{
-							fillformG(d.parent);
-							zoom(d);
-							d3.event.stopPropagation();
-						}
+					if(d.data.type){ 
+						findVar(d.data);
+					}else{ 
+						fillformG(d.data);
 					}
+					zoom(d);
+						d3.event.stopPropagation();
 				}
 			});
 	
@@ -573,14 +569,14 @@ function draw(){
 			.enter().append("text")
 			.attr("class", "label")
 			.style("display", function(d) {
-				return d.parent === json ? null : "none";
+				return d.parent === json ? "inline" : "none";
 			})
 			.style("fill-opacity", function(d) {
 				return d.parent === json ? 1 : 0;
 			})
 			.style("font-size", "20px")
 			.text(function(d) {
-				return d.label;
+				return d.data.label;
 			});
 	
 	zoomTo([json.x, json.y, json.r * 2 + 80]);
@@ -600,6 +596,7 @@ function zoomTo(v) {
 }
 
 function zoom(d) {
+	var focus0 = focus;
 	focus = d;
 	if(d.children){
 		var transition = d3.transition()
@@ -617,10 +614,10 @@ function zoom(d) {
 			.style("fill-opacity", function(d) {
 			  return d.parent === focus ? 1 : 0;
 			})
-			.each("start", function(d) {
+			.on("start", function(d) {
 			  if (d.parent === focus) this.style.display = "inline";
 			})
-			.each("end", function(d) {
+			.on("end", function(d) {
 			  if (d.parent !== focus) this.style.display = "none";
 			});
 	}

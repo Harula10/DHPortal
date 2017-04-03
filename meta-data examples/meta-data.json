@@ -2,7 +2,7 @@
  {
   "code": "Group 1",
   "label": "Group 1",
-  "parent": "none",
+  "parent": "None",
   "description": "Group 1",
   "children": [
    {
@@ -58,7 +58,7 @@
  {
   "code": "Group 2",
   "label": "Group 2",
-  "parent": "none",
+  "parent": "None",
   "description": "Group 2",
   "children": [
    {
