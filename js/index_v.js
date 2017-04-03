@@ -220,14 +220,17 @@ function findVar(e){
 
 function saveV(){
 	if(flagV){
-		editV(); //deletes the old variable
+		if(editV()){ //deletes the old variable
 		//delete the old var from group
-		var group = search(JSONobj,highlighted.group,false);
-		for(var i = 0; i < group.children.length;i++){
-			if(group.children[i].code == highlighted.code){ 
-				group.children.splice(i, 1);
-				break;
+			var group = search(JSONobj,highlighted.group,false);
+			for(var i = 0; i < group.children.length;i++){
+				if(group.children[i].code == highlighted.code){ 
+					group.children.splice(i, 1);
+					break;
+				}
 			}
+		}else{
+			return;
 		}
 	}
 	var new_vars = document.querySelectorAll(".vars");
@@ -283,7 +286,11 @@ function editV(){
 			document.getElementById("data").style.visibility = "visible";
 			currentRow == 1;
 		}
-	}else resetV();
+		return true;
+	}else{
+		resetV();
+		return false;
+	}
 }
 
 //enables the save button if there is any change in the form
