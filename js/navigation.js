@@ -97,6 +97,7 @@ function initVar(id,varclass){
 		tr.addEventListener("click",fillformV);
 		table.appendChild(tr);
 	}
+	vars = [];
 }
 
 function addVars(json){

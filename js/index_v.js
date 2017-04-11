@@ -5,11 +5,25 @@
 var currentRow;
 var flagV = false; //manages if the "save" action comes from updated variable or a new one
 
+function if_duplicates(code){
+	var table = document.querySelector("#table");
+	for(var i = 1; i < table.rows.length; i++){
+		if(code.trim() == table.rows[i].cells[0].innerHTML){
+			alert("The variable with the code '"+code.trim()+"' already exists!");
+			return true;
+		}
+	}
+	return false;
+}
 
 function saveV(){
 	if(flagV){
 		if(editV()){ //deletes the old variable from table
 		//delete the old var from group
+			if(highlighted.group.trim()==""){
+				var e = document.querySelector("#select2");
+				highlighted.group = e.options[e.selectedIndex].text;
+			}
 			if(highlighted.group=="None"){
 				for(var i = 0; i<JSONobj.length; i++){
 					if(JSON.stringify(JSONobj[i]) === JSON.stringify(highlighted) ){
@@ -32,45 +46,47 @@ function saveV(){
 		}
 	}
 	var new_vars = document.querySelectorAll(".vars");
-	//create a new row element
-	document.getElementById("data").style.visibility = "hidden";
-	var table = document.querySelector("#table");	
-	var tr = document.createElement("tr");
-	tr.setAttribute("class", "new"); //not uploaded ones
-	for(var i = 0; i < 4; i++){
+	if(!if_duplicates(new_vars[0].value)){
+		//create a new row element
+		document.getElementById("data").style.visibility = "hidden";
+		var table = document.querySelector("#table");	
+		var tr = document.createElement("tr");
+		tr.setAttribute("class", "new"); //not uploaded ones
+		for(var i = 0; i < 4; i++){
+			var td = document.createElement("td");
+			td.innerHTML = new_vars[i].value;
+			tr.appendChild(td);
+		}	
+		//add var into a group
+		var variable = {
+				"code" : new_vars[0].value,
+				"label" : new_vars[1].value,
+				"type" : new_vars[2].value,
+				"group" : new_vars[3].value,
+				"description" : new_vars[4].value,
+				"methodology" : new_vars[5].value
+			};
+		group = search(JSONobj,new_vars[3].value,false);
+		if(group){
+			if(JSON.stringify(group.children[0], null, ' ')=="{}")
+				group.children.splice(0, 1);
+			group.children.push(variable);
+		}else{
+			JSONobj.push(variable);
+		}
+		draw();
 		var td = document.createElement("td");
-		td.innerHTML = new_vars[i].value;
+		td.innerHTML = new_vars[5].value;
 		tr.appendChild(td);
-	}	
-	//add var into a group
-	var variable = {
-			"code" : new_vars[0].value,
-			"label" : new_vars[1].value,
-			"type" : new_vars[2].value,
-			"group" : new_vars[3].value,
-			"description" : new_vars[4].value,
-			"methodology" : new_vars[5].value
-		};
-	group = search(JSONobj,new_vars[3].value,false);
-	if(group){
-		if(JSON.stringify(group.children[0], null, ' ')=="{}")
-			group.children.splice(0, 1);
-		group.children.push(variable);
-	}else{
-		JSONobj.push(variable);
+		var td = document.createElement("td");
+		td.innerHTML = new_vars[4].value;
+		tr.appendChild(td);
+		tr.addEventListener("click",fillformV);
+		table.appendChild(tr);
+		
+		document.getElementById("formV").reset();
+		document.querySelector("#delV").disabled = true;
 	}
-	draw();
-	var td = document.createElement("td");
-	td.innerHTML = new_vars[5].value;
-	tr.appendChild(td);
-	var td = document.createElement("td");
-	td.innerHTML = new_vars[4].value;
-	tr.appendChild(td);
-	tr.addEventListener("click",fillformV);
-	table.appendChild(tr);
-	
-	document.getElementById("formV").reset();
-	document.querySelector("#delV").disabled = true;
 }
 
 function editV(){
