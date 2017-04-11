@@ -3,14 +3,14 @@ body{
 	width: 75%;
 	padding: 0.5%;
 	font-family: arial, sans-serif;
-    font-size: 20px;
+    font-size: 15px;
 }
 
 /*PANELS*/
 
 .panels{
 	width: 47%;
-	height: 360px;
+	height: 470px;
 	display: block;
 	margin: 0.5%;
 	text-align: vertical;
@@ -52,7 +52,7 @@ legend{
 }
 
 input, textarea, select{
-	font-size: 20px;
+	font-size: 15px;
 	min-width: 60%;
 	float:right;
 }
@@ -68,7 +68,7 @@ textarea{
 .field_buttons{
 	border-radius: 10px;	
 	background-color:  #b3e6ff;
-	font-size: 20px;
+	font-size: 15px;
 	float: right;
 	padding: 1%;
 	margin: 1%;

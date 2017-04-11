@@ -23,7 +23,7 @@ var init = true;
 var svg;
 var pack;
 var color;
-var	diameter = 350;
+var	diameter = 450;
 function initializeSVG(){
 	svg = d3.select("#groups").append("svg")
 			.attr("width", diameter)
@@ -63,9 +63,11 @@ function getFile(event,id){
 		if(id=='inputfile'){
 			var result = JSON.parse(fr.result);
 			var formatted = JSON.stringify(result, null, 2);
-			JSONobj = result;
+			JSONobj = result.slice();
 			//find all the variables
 			addVars(JSONobj);
+			
+			//Reset all the panels??
 			draw();
 		}else{
 			//split each row of csv file
@@ -87,7 +89,6 @@ function initVar(id){
 	var table = document.querySelector("#table");	
 	for(var i = 0; i < vars.length; i++){
 		var tr = document.createElement("tr");
-		tr.setAttribute("id", vars[i].group); //group as row id
 		if(id=='inputfile'){
 			add_option("select",vars[i].group);
 			add_option("select2",vars[i].group);
@@ -104,6 +105,9 @@ function initVar(id){
 		td.innerHTML = vars[i].type;
 		tr.appendChild(td);	
 		td = document.createElement("td");
+		td.innerHTML = vars[i].group;
+		tr.appendChild(td);	
+		td = document.createElement("td");
 		td.innerHTML = vars[i].description;
 		tr.appendChild(td);	
 		td = document.createElement("td");
@@ -118,8 +122,11 @@ function initVar(id){
 function addVars(json){
 	for (obj in json){
         var node = json[obj]; 
-		if(node.methodology){
+		if(node.type){
 			vars.push(node);
+		}else{
+			if(JSON.stringify(node.children, null, '' )=="[{}]")
+				add_option("select",node.label) , add_option("select2",node.label);
 		}
         if (node.children){
             var sub_json = addVars(node.children);
@@ -146,13 +153,22 @@ function deleteV(){
 		document.querySelector("#delV").disabled = true;
 		
 		var group = search(JSONobj,highlighted.group,false);
-		for(var i = 0; i < group.children.length;i++){
-			if(group.children[i].code == highlighted.code){ 
-				group.children.splice(i, 1);
-				if(!group.children[0]){
-					group.children = [{}];
+		if(group){
+			for(var i = 0; i < group.children.length;i++){
+				if(group.children[i].code == highlighted.code){ 
+					group.children.splice(i, 1);
+					if(!group.children[0]){
+						group.children = [{}];
+					}
+					break;
 				}
-				break;
+			}
+		}else{
+			for(var i = 0; i<JSONobj.length; i++){
+				if(JSON.stringify(JSONobj[i]) === JSON.stringify(highlighted) ){
+					JSONobj.splice(i,1);
+					break;
+				}
 			}
 		}
 	}
@@ -195,9 +211,9 @@ function findVar(e){
 				vars[0].value = table.rows[i].cells[0].innerHTML;
 				vars[1].value = table.rows[i].cells[1].innerHTML;
 				vars[2].value = table.rows[i].cells[2].innerHTML;
-				vars[3].value = table.rows[i].id;
-				vars[4].value = table.rows[i].cells[4].innerHTML;
-				vars[5].value = table.rows[i].cells[3].innerHTML;	
+				vars[3].value = table.rows[i].cells[3].innerHTML;;
+				vars[4].value = table.rows[i].cells[5].innerHTML;
+				vars[5].value = table.rows[i].cells[4].innerHTML;	
 			}
 			currentRow = i;
 			highlighted = {
@@ -220,13 +236,23 @@ function findVar(e){
 
 function saveV(){
 	if(flagV){
-		if(editV()){ //deletes the old variable
+		if(editV()){ //deletes the old variable from table
 		//delete the old var from group
-			var group = search(JSONobj,highlighted.group,false);
-			for(var i = 0; i < group.children.length;i++){
-				if(group.children[i].code == highlighted.code){ 
-					group.children.splice(i, 1);
-					break;
+			if(highlighted.group=="None"){
+				for(var i = 0; i<JSONobj.length; i++){
+					if(JSON.stringify(JSONobj[i]) === JSON.stringify(highlighted) ){
+						JSONobj.splice(i,1);
+						break;
+					}
+				}
+			}else{
+				var group = search(JSONobj,highlighted.group,false);
+				for(var i = 0; i < group.children.length;i++){
+					if(group.children[i].code == highlighted.code){ 
+						group.children.splice(i, 1);
+						if(!group.children[0]) group.children.push({});
+						break;
+					}
 				}
 			}
 		}else{
@@ -234,48 +260,45 @@ function saveV(){
 		}
 	}
 	var new_vars = document.querySelectorAll(".vars");
-	if(new_vars[3].value==""){
-		alert("You should create a group first!");
-	}else{ //create a new row element
-		document.getElementById("data").style.visibility = "hidden";
-		var table = document.querySelector("#table");	
-		var tr = document.createElement("tr");
-		tr.setAttribute("id", new_vars[3].value); //group as row id
-		tr.setAttribute("class", "new"); //not uploaded ones
-		for(var i = 0; i < 3; i++){
-			var td = document.createElement("td");
-			td.innerHTML = new_vars[i].value;
-			tr.appendChild(td);
-		}	
-		//add var into a group
-		group = search(JSONobj,new_vars[3].value,false);
-		if(group){
-			var variable = {
-				"code" : new_vars[0].value,
-				"label" : new_vars[1].value,
-				"type" : new_vars[2].value,
-				"group" : new_vars[3].value,
-				"description" : new_vars[4].value,
-				"methodology" : new_vars[5].value
-			};
-			if(JSON.stringify(group.children[0], null, ' ')=="{}")
-				group.children.splice(0, 1);
-			group.children.push(variable);
-			draw();
-		}
-		
+	//create a new row element
+	document.getElementById("data").style.visibility = "hidden";
+	var table = document.querySelector("#table");	
+	var tr = document.createElement("tr");
+	tr.setAttribute("class", "new"); //not uploaded ones
+	for(var i = 0; i < 4; i++){
 		var td = document.createElement("td");
-		td.innerHTML = new_vars[5].value;
+		td.innerHTML = new_vars[i].value;
 		tr.appendChild(td);
-		var td = document.createElement("td");
-		td.innerHTML = new_vars[4].value;
-		tr.appendChild(td);
-		tr.addEventListener("click",fillformV);
-		table.appendChild(tr);
-		
-		document.getElementById("formV").reset();
-		document.querySelector("#delV").disabled = true;
+	}	
+	//add var into a group
+	var variable = {
+			"code" : new_vars[0].value,
+			"label" : new_vars[1].value,
+			"type" : new_vars[2].value,
+			"group" : new_vars[3].value,
+			"description" : new_vars[4].value,
+			"methodology" : new_vars[5].value
+		};
+	group = search(JSONobj,new_vars[3].value,false);
+	if(group){
+		if(JSON.stringify(group.children[0], null, ' ')=="{}")
+			group.children.splice(0, 1);
+		group.children.push(variable);
+	}else{
+		JSONobj.push(variable);
 	}
+	draw();
+	var td = document.createElement("td");
+	td.innerHTML = new_vars[5].value;
+	tr.appendChild(td);
+	var td = document.createElement("td");
+	td.innerHTML = new_vars[4].value;
+	tr.appendChild(td);
+	tr.addEventListener("click",fillformV);
+	table.appendChild(tr);
+	
+	document.getElementById("formV").reset();
+	document.querySelector("#delV").disabled = true;
 }
 
 function editV(){
@@ -310,12 +333,11 @@ function fillformV(e){
 	
 	var vars = document.querySelectorAll(".vars");
 	var columns = document.getElementById("table").rows[index].cells;
-	for(var i = 0; i < 3; i++){
+	for(var i = 0; i < 4; i++){
 		vars[i].value = columns[i].innerHTML;
 	}	
-	vars[3].value = document.getElementById("table").rows[index].id;
-	vars[4].value = columns[4].innerHTML;
-	vars[5].value = columns[3].innerHTML;	
+	vars[4].value = columns[5].innerHTML;
+	vars[5].value = columns[4].innerHTML;	
 	
 	document.querySelector("#saveV").disabled = true;
 	document.querySelector("#delV").disabled = false;
@@ -358,11 +380,9 @@ function deleteG(){
 			}
 		}
 		var table = document.getElementById("table").rows;
-		for(var i = 1; i < table.length ; ){
-			if(table[i].id == selected.label){
-				table[i].remove();
-			}else{
-				i++;
+		for(var i = 1; i < table.length ; i++ ){
+			if(table[i].cells[3].innerHTML == selected.label){
+				table[i].className = 'new';
 			}
 		}
 		var found = search(JSONobj,selected,true);
@@ -394,10 +414,7 @@ function fillformG(d){
 	var groups = document.querySelectorAll(".groups");
 	groups[0].value = d.code;
 	groups[1].value = d.label;
-	if(d.parent==="none")
-		groups[2].value = "None";
-	else
-		groups[2].value = d.parent;
+	groups[2].value = d.parent;
 	groups[3].value = d.description;
 	selected = {
 			"code" : groups[0].value,
@@ -525,7 +542,7 @@ function draw(){
 
 	d3.select("#groups")//.style("background", color(-1))
 			.on("click", function() {
-					zoom(json);
+				zoom(json);
 			});
 		
 	var pack = d3.pack()
@@ -543,14 +560,7 @@ function draw(){
 			.data(nodes)
 			.enter().append("circle")
 			.attr("class", function(d) {
-					if(d.parent){
-						//if(d.children)
-							return "node";
-						//else
-						//	return "node node--leaf";
-					}else{
-						return "node node--root";
-					}
+					return d.parent ? "node":"node node--root";
 			})
 			.style("fill", function(d) {
 				return d.children ? color(d.depth) : '#FFF';
@@ -563,11 +573,14 @@ function draw(){
 				if (focus !== d){	
 					if(d.data.type){ 
 						findVar(d.data);
+						zoom(d.parent);
 					}else{ 
-						fillformG(d.data);
+						if(d.children)
+							fillformG(d.data),zoom(d);
+						else	
+							zoom(d.parent);
 					}
-					zoom(d);
-						d3.event.stopPropagation();
+					d3.event.stopPropagation();
 				}
 			});
 	
@@ -581,9 +594,9 @@ function draw(){
 			.style("fill-opacity", function(d) {
 				return d.parent === json ? 1 : 0;
 			})
-			.style("font-size", "20px")
+			.style("font-size", "15px")
 			.text(function(d) {
-				return d.data.label;
+				return d.data.label ? d.data.label : "Empty Group";
 			});
 	
 	zoomTo([json.x, json.y, json.r * 2 + 80]);
@@ -611,21 +624,22 @@ function zoom(d) {
 				.tween("zoom", function(d) {
 						var i = d3.interpolateZoom(view, [focus.x, focus.y, focus.r * 2 + 50]);
 						return function(t) {
-								zoomTo(i(t));
+							zoomTo(i(t));
 						};
 				});
+			
 		transition.selectAll("text")
 			.filter(function(d) {
-			  return d.parent === focus || this.style.display === "inline";
+				return d.parent === focus || this.style.display === "inline";
 			})
 			.style("fill-opacity", function(d) {
-			  return d.parent === focus ? 1 : 0;
+				return d.parent === focus ? 1 : 0;
 			})
 			.on("start", function(d) {
-			  if (d.parent === focus) this.style.display = "inline";
+				if (d.parent === focus) this.style.display = "inline";
 			})
 			.on("end", function(d) {
-			  if (d.parent !== focus) this.style.display = "none";
+				if (d.parent !== focus) this.style.display = "none";
 			});
 	}
 }
@@ -645,7 +659,7 @@ function search(json,_node,_flag){
 			}
 		}
         if (node.children){
-            var sub_json = search(node.children,_node);
+            var sub_json = search(node.children,_node,_flag);
             if (sub_json)
                 return sub_json;
         }
