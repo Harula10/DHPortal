@@ -7,10 +7,6 @@
 	stroke-width: 2.5px;
 }
 
-.node--leaf {
-	fill: white;
-}
-
 .label {
 	font: 11px "Helvetica Neue", Helvetica, Arial, sans-serif;
 	text-anchor: middle;
@@ -18,15 +14,6 @@
 }
 
 .label,
-.node--root,
-.node--leaf {
+.node--root {
 		pointer-events: none;
-}
-
-.meter-background {
-		fill: #DFEAFD;
-}
-
-.meter-foreground {
-		fill: #2E7AF9;
 }
