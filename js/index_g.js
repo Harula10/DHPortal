@@ -168,6 +168,9 @@ function editG(){
 }
 
 function saveG(){
+	if(checkrequired("groups requiredField")){ //if the required fields are not filled
+		return;
+	}
 	var groups = document.querySelectorAll(".groups");
 	if(flagG){ //if you need to edit a group
 		if(confirm("Are you sure you want to edit this group?")){
@@ -383,29 +386,6 @@ function delete_option(id,option_name){
 		if (document.getElementById(id).options[i].text == option_name){
 			document.getElementById(id).remove(i);
 			break;
-		}
-	}
-}
-
-function select_tab(e){
-	var li = document.querySelectorAll("#varbar > ul > li");
-	for(var i = 0; i < li.length; i++){
-		li[i].removeAttribute("id");
-	}
-	e.target.parentElement.setAttribute("id","selected");
-	var tr = document.querySelectorAll("tr:not(#table)");
-	for(var i = 0; i<tr.length; i++){
-		tr[i].style.display = "table-row";
-	}
-	if(e.target.innerHTML=="New"){
-		var tr = document.getElementsByClassName("uploaded");
-		for(var i = 0; i<tr.length; i++){
-			tr[i].style.display = "none";
-		}
-	}else if(e.target.innerHTML=="Uploaded"){
-		var tr = document.getElementsByClassName("new");
-		for(var i = 0; i<tr.length; i++){
-			tr[i].style.display = "none";
 		}
 	}
 }

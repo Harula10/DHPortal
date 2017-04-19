@@ -17,6 +17,9 @@ function if_duplicates(code){
 }
 
 function saveV(){
+	if(checkrequired("vars requiredField")){ //if the required fields are not filled
+		return;
+	}
 	if(flagV){
 		if(editV()){ //deletes the old variable from table
 		//delete the old var from group
@@ -232,4 +235,50 @@ function highlight(){
 			row[i].classList.remove('highlight'); 
 	}
 	document.getElementById("table").rows[currentRow].classList.add('highlight');
+}
+
+function select_tab(e){
+	var li = document.querySelectorAll("#varbar > ul > li");
+	for(var i = 0; i < li.length; i++){
+		li[i].removeAttribute("id");
+	}
+	e.target.parentElement.setAttribute("id","selected");
+	var tr = document.querySelectorAll("tr:not(#table)");
+	for(var i = 0; i<tr.length; i++){
+		tr[i].style.display = "table-row";
+	}
+	if(e.target.innerHTML=="New"){
+		var tr = document.getElementsByClassName("uploaded");
+		for(var i = 0; i<tr.length; i++){
+			tr[i].style.display = "none";
+		}
+	}else if(e.target.innerHTML=="Uploaded"){
+		var tr = document.getElementsByClassName("new");
+		for(var i = 0; i<tr.length; i++){
+			tr[i].style.display = "none";
+		}
+	}
+}
+
+//Code and Label are required fields.
+//returns true if the required fields are empty
+function checkrequired(classname){
+	var required = document.getElementsByClassName(classname);
+	var isfilled = true;
+	var str="";
+	if(required[0].value==""){
+		str = str+"Code ";
+		isfilled = false;
+	}
+	if(required[1].value==""){
+		if(!isfilled){
+			str = str+"and Label ";
+		}else{
+			str = str+"Label ";
+			isfilled = false;
+		}
+	}
+	if(!isfilled)
+		alert(str+"is required!");
+	return !isfilled;		
 }
