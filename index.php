@@ -1,7 +1,6 @@
 <?php
 	session_start();
 ?>
-
 <!DOCTYPE html>
 <html>
 	<head>
@@ -15,27 +14,29 @@
 		<script src="https://d3js.org/d3.v4.min.js"></script>
 	</head>
 	<body>
-	<div id="login">
-		<p>Welcome to DHPortal!</p><br><br>
-		
-		E-mail: <input class="data" type="text"><br><br>
-		Password: <input class="data" type="password"><br><br>
-		<br><br>
-		<button class="but" onclick="register()">Register</button> <button class="but log" onclick="login()">Log In</button> 
-	</div>
+	<?php
+		if(!isset($_SESSION["logged_user"])){
+			echo '<div id="login">
+					<p>Welcome to DHPortal!</p><br><br>
+					E-mail: <input class="data" type="text"><br><br>
+					Password: <input class="data" type="password"><br><br>
+					<br><br>
+					<button class="but" onclick="register()">Register</button> <button class="but log" onclick="login()">Log In</button>
+				</div>';
+		}
+	?>
 	
 	<div id="elements">
-		<p id="logout" onclick="logout">Log out</p>
 		<div>
 			<nav id="bar">
 				<ul>
-				  <li><input type="file" onchange="getFile(event,'inputfile')"  accept=".json" id="inputfile"/><a onclick="uploadJSON()">Upload meta-data(JSON)</a></li>
-				  <li><a onclick="downloadJSON()">Download meta-data(JSON)</a></li>
-				  <li><input type="file" onchange="getFile(event,'inputfilecsv')"  accept=".csv" id="inputfilecsv"/><a onclick="uploadCSV()">Upload Variables(CSV)</a></li>
+				  <li><input type="file" onchange="getFile(event,'inputfile')"  accept=".json" id="inputfile"/><a class="navlink">Upload meta-data(JSON)</a></li>
+				  <li><a class="navlink">Download meta-data(JSON)</a></li>
+				  <li><input type="file" onchange="getFile(event,'inputfilecsv')"  accept=".csv" id="inputfilecsv"/><a class="navlink">Upload Variables(CSV)</a></li>
 				</ul>
 			</nav>
 		</div>
-	
+		
 		<div id="body">
 			<div class="panels" id="groups">
 			</div>
@@ -96,6 +97,7 @@
 				</fieldset>
 				</form>
 			</div>
+			<a id="logout" href="others/logout.php">Log out</a>
 		</div>   
 	</div>
 	</body>

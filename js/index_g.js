@@ -1,19 +1,3 @@
-window.onload = function(){
-	var x = document.querySelectorAll(".field_buttons");
-	x[0].addEventListener("click",resetG);
-	x[1].addEventListener("click",deleteG);
-	x[2].addEventListener("click",saveG);
-	x[3].addEventListener("click",resetV);
-	x[4].addEventListener("click",deleteV);
-	x[5].addEventListener("click",saveV);
-	var li = document.querySelectorAll("#varbar > ul > li");
-	for(var i = 0; i < li.length; i++){
-		li[i].addEventListener("click",select_tab);
-	}
-	initializeSVG();
-};
-
-
 /*
 	SVG INITIALIZER
 */
