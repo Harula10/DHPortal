@@ -166,7 +166,8 @@ function saveG(){
 	}else{
 		//if the "code" already exists don't add that group
 		if(if_exists(groups[0].value)){
-			alert("The group with the code "+groups[0].value+" already exists.");
+			alert("The group with the code '"+groups[0].value+"' already exists.");
+			return;
 		}else{
 			codes.push(groups[0].value);
 			var node = {
