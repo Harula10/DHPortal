@@ -1,19 +1,16 @@
 /*
 	SVG INITIALIZER
 */
-var JSONobj = [];
+var JSONobj  = JSON.parse(localStorage.JSONobj);
 var codes = [];
 var init = true;
 var svg;
 var pack;
 var color;
-var	diameter = 450;
+var	diameter = 650;
+
 function initializeSVG(){
-	svg = d3.select("#groups").append("svg")
-			.attr("width", diameter)
-			.attr("height", diameter)
-			.append("g")
-			.attr("transform", "translate(" + diameter / 2 + "," + diameter / 2 + ")");
+	svg = d3.select("svg").append("g").attr("transform", "translate(" + (diameter+70)/2 + "," + (diameter-50)/2 + ")");
 }
 
 /*
@@ -199,7 +196,8 @@ var circle;
 var focus;
 var text;
 function draw(){
-	var str = JSON.stringify(JSONobj, null, ' '); 
+	localStorage.JSONobj =  JSON.stringify(JSONobj);
+	var str = localStorage.JSONobj;
 	var new_str = "{ \"label\": \"None\", \"children\":" + str +"}";
 	var json = JSON.parse(new_str);
 	
@@ -211,7 +209,7 @@ function draw(){
 		.range(["hsl(152,80%,80%)", "hsl(228,30%,40%)"])
 		.interpolate(d3.interpolateHcl);
 
-	d3.select("#groups")//.style("background", color(-1))
+	d3.select("#groups")
 			.on("click", function() {
 				zoom(json);
 			});
