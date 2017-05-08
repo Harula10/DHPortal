@@ -221,3 +221,7 @@ function addVars(json){
         }
     }
 }
+
+function clearStorage(){
+	localStorage.clear();
+}

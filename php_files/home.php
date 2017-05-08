@@ -44,7 +44,7 @@
 					</div>
 				</div>
 				<br><br><br>
-				<li><a href="logout.php">Log out</a></li>
+				<li><a href="logout.php" onclick="clearStorage()">Log out</a></li>
 			</ul>
 		</div>
 		<div id="folders">
