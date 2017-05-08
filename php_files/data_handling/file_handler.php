@@ -12,7 +12,9 @@
 		}
 	}else if($action=="share"){
 		$path = "../users/".$_SESSION["logged_user"]."/".$folder;
-		file_put_contents("../".$path,$data);
+		$file = fopen("../".$path,"w");
+		fwrite($file,$data);
+		fclose($file);
 		echo "Meta-data has been saved!";
 	}else if($action=="loadfriendfile"){
 		$path = "../users/".$folder; //$folder: 'friend_username/public'
