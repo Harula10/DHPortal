@@ -35,7 +35,7 @@
 						<a onclick="loadData('private')" onmouseover="showload()">From your private folder...</a>
 						<a onclick="loadData('public')" onmouseover="showload()">From your public folder...</a>
 					</div>
-				</div>
+				</div><br>
 				<div class="dropdown">
 					<li><a class="navlink">Save meta-data</a></li>
 					<div class="dropdown-content" onmouseout="hidemenu(1)">

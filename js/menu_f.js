@@ -21,13 +21,19 @@ window.onload = function(){
 	y[3].addEventListener("click",showload);
 	y[4].addEventListener("click",showshare);
 	
-	JSONobj = JSON.parse(localStorage.JSONobj);
-	addVars(JSONobj);
-	draw();
-	initVar('inputfile',"uploaded");
-	rows = localStorage.variables.split("\n");
-	readCSV('inputfilecsv',rows);
+	if(localStorage.JSONobj){
+		JSONobj = JSON.parse(localStorage.JSONobj);
+		addVars(JSONobj);
+		draw();
+		initVar('inputfile',"uploaded");
+	}else{
+		JSONobj = [];
+	}
 	
+	if(localStorage.variables){
+		rows = localStorage.variables.split("\n");
+		readCSV('inputfilecsv',rows);
+	}	
 }
 
 function downloadJSON(){
@@ -125,8 +131,8 @@ function getFile(id){
 	var fr = new FileReader();
 	fr.onload = function() { 
 		if(id=='inputfile'){
-			var result = JSON.parse(fr.result);
 			localStorage.JSONobj = fr.result;
+			var result = JSON.parse(fr.result);
 			JSONobj = result.slice();
 			//find all the variables and add them to array
 			addVars(JSONobj);
@@ -161,6 +167,7 @@ function readCSV(id,rows){
 		};
 		vars.push(variable);
 	}
+	localStorage.variables = JSON.stringify(vars);
 	initVar(id,"new");
 }
 
@@ -207,7 +214,7 @@ function addVars(json){
 			vars.push(node);
 		}else{
 			if(JSON.stringify(node.children, null, '' )=="[{}]")
-				add_option("select",node.label) , add_option("select2",node.label);
+				codes.push(node.label),add_option("select",node.label) , add_option("select2",node.label);
 		}
         if (node.children){
             var sub_json = addVars(node.children);

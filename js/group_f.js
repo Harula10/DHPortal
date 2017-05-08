@@ -1,7 +1,7 @@
 /*
 	SVG INITIALIZER
 */
-var JSONobj  = JSON.parse(localStorage.JSONobj);
+var JSONobj;
 var codes = [];
 var init = true;
 var svg;
@@ -37,22 +37,13 @@ function changeAttrG(){
 
 function deleteG(){
 	if (confirm("Are you sure you want to delete this group?")) {
-		for(var i = 0; i < codes.length;i++){
-			if(codes[i] == selected.code){ //the node we want to delete
-				codes.splice(i, 1);
-				break;
-			}
-		}
-		var table = document.getElementById("table").rows;
-		for(var i = 1; i < table.length ; i++ ){
-			if(table[i].cells[3].innerHTML == selected.label){
-				table[i].className = 'new';
-			}
-		}
+		codes.splice(codes.indexOf(selected.label), 1);
+		clearTable(selected.label);
 		var found = search(JSONobj,selected,true);
 		if(found){
 			for(var i = 0; i < found.children.length;i++){
 				if(found.children[i].code == selected.code){ //we found the child we should delete;
+					hasgroupchild(found.children[i].children,selected);
 					found.children.splice(i, 1);
 					break;
 				}
@@ -60,6 +51,8 @@ function deleteG(){
 		}else{ //is a root element
 			for(var i = 0; i < JSONobj.length;i++){
 				if(JSONobj[i].code == selected.code){ //we found the child we should delete
+					//if that child has a group child then....
+					hasgroupchild(JSONobj[i].children,selected);
 					JSONobj.splice(i, 1);
 					break;
 				}
@@ -70,6 +63,31 @@ function deleteG(){
 		document.getElementById("formG").reset();	
 		draw();
 	}
+}
+
+function clearTable(label){
+	var table = document.getElementById("table").rows;
+	for(var i = 1; i < table.length ; i++ ){
+		if(table[i].cells[3].innerHTML == label){
+			table[i].className = 'new';
+			table[i].cells[3].innerHTML = "";
+		}
+	}
+}
+
+function hasgroupchild(json,selected){
+	for (obj in json){
+        var node = json[obj]; 
+		if (selected.label == node.parent){
+			delete_option("select",node.label);
+			delete_option("select2",node.label);
+			clearTable(node.label);
+		}
+        if (node.children){
+            if(hasgroupchild(node.children,node)) return true;
+        }
+    }
+    return false;
 }
 
 var selected;
@@ -98,7 +116,8 @@ function editG(){
 		"label" : groups[1].value,
 		"parent" : groups[2].value,
 		"description" : groups[3].value
-	};			
+	};		
+	codes[selected.label] = node.label;
 	var found = search(JSONobj,selected,true);
 	if(!found){ //if the parent is the root
 		for(var i = 0; i < JSONobj.length;i++){
@@ -166,7 +185,7 @@ function saveG(){
 			alert("The group with the code '"+groups[0].value+"' already exists.");
 			return;
 		}else{
-			codes.push(groups[0].value);
+			codes.push(groups[1].value);
 			var node = {
 				"code" : groups[0].value,
 				"label" : groups[1].value,
