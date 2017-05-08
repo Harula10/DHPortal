@@ -7,19 +7,87 @@ body{
     font-size: 15px;
 }
 
-/*Friends Tab*/
-#friends div{
+/*POP UP WINDOW*/
+
+#folders{
+	display:none;
+	width: 50%;
+	height: 70%;
+	overflow: auto;
+	z-index: 1;
+	background-color: white;
+	border: 1px solid gray;
+	box-shadow: 0px 0px 5px rgba(10,0,0,.5);
+	position: absolute;
+	top: 15%;
+	left: 25%;
+	margin: auto;
+}
+
+#folders div div{
 	font-size: 20px;
-	text-align: center;
 	border: 2px solid #ccc;
+	text-align: center;
 	display: inline-block;
 	margin-right: 1%;
 	margin-bottom: 1%;
 	cursor: pointer;
-	background-color: #b3e6ff;
-	padding-top: 3%;
-	height: 70px;
-	width: 130px;
+	background-repeat: no-repeat;
+    background-attachment: fixed;
+    background-position: center; 
+	padding-top:1%;
+	padding-bottom:2%;
+	height: 27%;
+	width: 20%;
+}
+
+#files{
+	margin: 10px;
+	margin-top: 40px;
+}
+
+.close {
+    position: absolute;
+    right: 20px;
+    top: 10px;
+    color: #000;
+    font-size: 30px;
+    font-weight: bold;
+}
+
+.close:hover,
+.close:focus {
+    color: red;
+    cursor: pointer;
+}
+
+/*Friends Tab*/
+#friends div{
+	font-size: 20px;
+	border: 2px solid #ccc;
+	text-align: center;
+	display: inline-block;
+	margin-right: 1%;
+	margin-bottom: 1%;
+	cursor: pointer;
+	background-repeat: no-repeat;
+    background-attachment: fixed;
+    background-position: center; 
+	padding-top:1%;
+	height: 17%;
+	width: 10%;
+}
+
+#friends div img, #folders div div img{
+	border: 2px solid #ccc;
+	margin: auto;
+	display: block;
+	height: 60%;
+	width: 60%;
+}
+
+#friends div:hover, #folders div div:hover{
+	border: 1px solid gray;
 }
 
 #friends{
@@ -152,55 +220,6 @@ h2{
 	text-shadow: none;
 }
 
-/*POP UP WINDOW*/
-
-#folders{
-	display:none;
-	width: 50%;
-	height: 70%;
-	overflow: auto;
-	z-index: 1;
-	background-color: white;
-	border: 1px solid gray;
-	box-shadow: 0px 0px 5px rgba(10,0,0,.5);
-	position: absolute;
-	top: 15%;
-	left: 25%;
-}
-
-#files{
-	margin: 10px;
-	margin-top: 40px;
-}
-
-#files div{
-	font-size: 20px;
-	text-align: center;
-	border: 2px solid #ccc;
-	display: inline-block;
-	margin-right: 1%;
-	margin-bottom: 1%;
-	cursor: pointer;
-	background-color: #b3e6ff;
-	padding-top: 3%;
-	height: 70px;
-	width: 130px;
-}
-
-.close {
-    position: absolute;
-    right: 20px;
-    top: 10px;
-    color: #000;
-    font-size: 30px;
-    font-weight: bold;
-}
-
-.close:hover,
-.close:focus {
-    color: red;
-    cursor: pointer;
-}
 
 /*PANELS*/
 #body{
