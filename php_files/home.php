@@ -24,6 +24,7 @@
 			<ul>
 				<li><a href="home.php">Home</a></li>
 				<li><a href="myfriends.php">My friends</a></li>
+				<li><a href="harmonization.php">Harmonize data</a></li>
 				<br><br><br>
 				<li><input type="file" onchange="getFile('inputfile')"  accept=".json" id="inputfile"/><a class="navlink">Upload meta-data(JSON)</a></li>
 				<li><a class="navlink">Download meta-data(JSON)</a></li>
@@ -54,9 +55,9 @@
 		</div>
 		<div id="body">
 			<div class="panels" id="groups">
-			<svg width="740" height="590"></svg>
+			<button class="clear" onclick="clearData()">Clear all data</button>
+			<svg></svg>
 			</div>
-			
 			<div class="panels" id="variables" align="center">
 				<nav id="varbar">
 					<ul>
@@ -77,7 +78,6 @@
 				</table>
 				<p id="data">No Data.</p>
 			</div>
-			
 			<div class="panels" id="insert_group">
 				<form id="formG" onchange="changeAttrG()">
 				<fieldset>

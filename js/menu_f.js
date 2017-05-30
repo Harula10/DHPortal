@@ -1,4 +1,6 @@
 var rows;
+var vars;
+var user_vars;
 window.onload = function(){	
 	var x = document.querySelectorAll(".field_buttons");
 	x[0].addEventListener("click",resetG);
@@ -13,7 +15,7 @@ window.onload = function(){
 		li[i].addEventListener("click",select_tab);
 	}
 	
-	initializeSVG();
+	initializeSVG(1);
 	var y = document.querySelectorAll(".navlink");
 	y[0].addEventListener("click",uploadJSON);
 	y[1].addEventListener("click",downloadJSON);
@@ -21,19 +23,29 @@ window.onload = function(){
 	y[3].addEventListener("click",showload);
 	y[4].addEventListener("click",showshare);
 	
+	//LOCAL DATA
+	if(localStorage.variables){
+		vars = JSON.parse(localStorage.variables);
+		for (var i = 0; i < vars.length; i++){
+			initVar(vars[i],'inputfilecsv','uploaded');	
+		}
+	}else{
+		vars = [];
+	}
+	
 	if(localStorage.JSONobj){
 		JSONobj = JSON.parse(localStorage.JSONobj);
-		addVars(JSONobj);
+		addVars(JSONobj,'uploaded');
 		draw();
-		initVar('inputfile',"uploaded");
 	}else{
 		JSONobj = [];
 	}
 	
-	if(localStorage.variables){
-		rows = localStorage.variables.split("\n");
-		readCSV('inputfilecsv',rows);
-	}	
+	if(localStorage.csv){
+		rows = localStorage.csv.split("\n");
+		readCSV();
+		localStorage.removeItem("csv");
+	}
 }
 
 function downloadJSON(){
@@ -107,13 +119,12 @@ function chooseFile(path){
 			if(path.includes(".json")){
 				localStorage.JSONobj = allText;
 				JSONobj = JSON.parse(localStorage.JSONobj);
-				addVars(JSONobj);
+				addVars(JSONobj,'uploaded');
 				draw();
-				initVar('inputfile',"uploaded");
 			}else if(path.includes(".csv")){
 				//split each row of csv file
 				rows = allText.split("\n");
-				readCSV('inputfilecsv',rows);
+				readCSV('new');
 			}else{
 				alert("Wrong type!");
 			}
@@ -122,12 +133,10 @@ function chooseFile(path){
     file.send(null);
 }
 
-var vars = [];
+
 function getFile(id){
 	var files = document.getElementById(id).files;
-	
 	if (files.length <= 0) return;
-	
 	var fr = new FileReader();
 	fr.onload = function() { 
 		if(id=='inputfile'){
@@ -135,22 +144,19 @@ function getFile(id){
 			var result = JSON.parse(fr.result);
 			JSONobj = result.slice();
 			//find all the variables and add them to array
-			addVars(JSONobj);
+			addVars(JSONobj,'uploaded');
 			draw();
-			//add vars to list
-			initVar(id,"uploaded");
 		}else{
 			//split each row of csv file
-			localStorage.variables = fr.result;
 			rows = fr.result.split("\n");
-			readCSV(id,rows);
+			readCSV();
 		}
 		
 	}
 	fr.readAsText(files.item(0));
 }
 
-function readCSV(id,rows){
+function readCSV(){
 	for (var i = 1; i < rows.length-1; i++) {
 		var cells = rows[i].split(";");
 		if(cells[2].trim()!="Polynominal" && cells[2].trim()!="Binominal" && cells[2].trim()!="Real" ){
@@ -163,58 +169,68 @@ function readCSV(id,rows){
 			"type" : cells[2].trim(),
 			"group" : "",
 			"description" : cells[3],
-			"methodology" : cells[4]
+			"methodology" : cells[4],
 		};
-		vars.push(variable);
+		var_push(variable,'inputfilecsv',"new");
 	}
-	localStorage.variables = JSON.stringify(vars);
-	initVar(id,"new");
 }
 
-function initVar(id,varclass){
+function var_push(data,id,classname){
+	var f = true;
+	for (var i = 0; i < vars.length; i++) { //if a variable already exists
+		if (vars[i].code == data.code && vars[i].group == data.group ) { //don't add it in array
+			f = false;
+		}
+	}
+	if(f){ //if it doesn't exists add it in array AND table
+		vars.push(data);
+		localStorage.variables = JSON.stringify(vars);
+		initVar(data,id,classname);
+	}
+}
+
+function initVar(data,id,classname){
 	document.getElementById("data").style.visibility = "hidden";
 	var table = document.querySelector("#table");	
-	for(var i = 0; i < vars.length; i++){
-		var tr = document.createElement("tr");
-		if(id=='inputfile'){
-			add_option("select",vars[i].group);
-			add_option("select2",vars[i].group);
-		}
-		tr.setAttribute("class", varclass); //uploaded or new ones
-		
-		var td = document.createElement("td");
-		td.innerHTML = vars[i].code;
-		tr.appendChild(td);	
-		td = document.createElement("td");
-		td.innerHTML = vars[i].label;
-		tr.appendChild(td);	
-		td = document.createElement("td");
-		td.innerHTML = vars[i].type;
-		tr.appendChild(td);	
-		td = document.createElement("td");
-		td.innerHTML = vars[i].group;
-		tr.appendChild(td);	
-		td = document.createElement("td");
-		td.innerHTML = vars[i].description;
-		tr.appendChild(td);	
-		td = document.createElement("td");
-		td.innerHTML = vars[i].methodology;
-		tr.appendChild(td);	
-
-		tr.addEventListener("click",fillformV);
-		table.appendChild(tr);
+	var tr = document.createElement("tr");
+	if(id=='inputfile'){
+		add_option(document.getElementById("select"),data.group);
+		add_option(document.getElementById("select2"),data.group);
 	}
-	vars = [];
+
+	tr.setAttribute("class", classname); //uploaded or new ones
+	
+	var td = document.createElement("td");
+	td.innerHTML = data.code;
+	tr.appendChild(td);	
+	td = document.createElement("td");
+	td.innerHTML = data.label;
+	tr.appendChild(td);	
+	td = document.createElement("td");
+	td.innerHTML = data.type;
+	tr.appendChild(td);	
+	td = document.createElement("td");
+	td.innerHTML = data.group;
+	tr.appendChild(td);	
+	td = document.createElement("td");
+	td.innerHTML = data.description;
+	tr.appendChild(td);	
+	td = document.createElement("td");
+	td.innerHTML = data.methodology;
+	tr.appendChild(td);	
+
+	tr.addEventListener("click",fillformV);
+	table.appendChild(tr);
 }
 
 function addVars(json){
 	for (obj in json){
         var node = json[obj]; 
 		if(node.type){
-			vars.push(node);
-		}else{
-			if(JSON.stringify(node.children, null, '' )=="[{}]")
-				codes.push(node.label),add_option("select",node.label) , add_option("select2",node.label);
+			var_push(node,'inputfile',"uploaded");
+			codes.push(node.group);
+			add_option(document.getElementById("select"),node.group);
+			add_option(document.getElementById("select2"),node.group);
 		}
         if (node.children){
             var sub_json = addVars(node.children);
@@ -224,4 +240,10 @@ function addVars(json){
 
 function clearStorage(){
 	localStorage.clear();
+}
+
+
+function clearData(){
+	localStorage.clear();
+	window.location.href = "home.php";
 }

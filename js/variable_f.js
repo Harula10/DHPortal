@@ -55,6 +55,7 @@ function saveV(){
 		var table = document.querySelector("#table");	
 		var tr = document.createElement("tr");
 		tr.setAttribute("class", "new"); //not uploaded ones
+		
 		for(var i = 0; i < 4; i++){
 			var td = document.createElement("td");
 			td.innerHTML = new_vars[i].value;

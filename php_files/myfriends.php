@@ -24,6 +24,7 @@
 			<ul>
 				<li><a href="home.php">Home</a></li>
 				<li><a href="myfriends.php">My friends</a></li>
+				<li><a href="harmonization.php">Harmonize data</a></li>
 				<br><br><br>
 				<li class="disabled"><a class="navlink"><font color="gray">Upload meta-data(JSON)</font></a></li>
 				<li class="disabled"><a class="navlink"><font color="gray">Download meta-data(JSON)</font></a></li>

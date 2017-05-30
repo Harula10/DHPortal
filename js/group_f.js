@@ -7,10 +7,30 @@ var init = true;
 var svg;
 var pack;
 var color;
-var	diameter = 650;
+var	diameter = 620;
+var page;
 
-function initializeSVG(){
+function initializeSVG(p){
+	page = p;
 	svg = d3.select("svg").append("g").attr("transform", "translate(" + (diameter+70)/2 + "," + (diameter-50)/2 + ")");
+}
+
+function showdetails(node){
+	var row = document.querySelectorAll("#table tr + tr");
+	if(node.methodology){ //if the node is a variable
+		var td = row[1].childNodes;
+		td[0].innerHTML = node.code;
+		td[1].innerHTML = node.label;
+		td[2].innerHTML = node.type;
+		td[3].innerHTML = node.methodology;
+		td[4].innerHTML = node.description;
+	}else{
+		var td = row[0].childNodes;
+		td[0].innerHTML = node.code;
+		td[1].innerHTML = node.label;
+		td[2].innerHTML = node.parent;
+		td[4].innerHTML = node.description;
+	}
 }
 
 /*
@@ -205,8 +225,8 @@ function saveG(){
 		}
 	}
 	draw();
-	add_option("select",groups[1].value);
-	add_option("select2",groups[1].value);
+	add_option(document.getElementById("select"),groups[1].value);
+	add_option(document.getElementById("select2"),groups[1].value);
 	
 	document.getElementById("formG").reset();
 }
@@ -260,13 +280,23 @@ function draw(){
 			.on("click", function(d) { 
 				if (focus !== d){	
 					if(d.data.type){ 
-						findVar(d.data);
+						if(page==1){
+							findVar(d.data);
+						}else{
+							showdetails(d.data);
+						}
 						zoom(d.parent);
 					}else{ 
-						if(d.children)
-							fillformG(d.data),zoom(d);
-						else	
+						if(d.children){
+							if(page==1){
+								fillformG(d.data);
+							}else{
+								showdetails(d.data);
+							}
+							zoom(d);
+						}else{
 							zoom(d.parent);
+						}
 					}
 					d3.event.stopPropagation();
 				}
@@ -372,14 +402,14 @@ function if_exists(code){
 	return false;
 }
 
-function add_option(id,option_name) {
-	var length=document.getElementById(id).options.length;
+function add_option(element,option_name) {
+	var length=element.options.length;
 	for ( var i=0; i < length; i++ ) {
-		if (document.getElementById(id).options[i].text == option_name)  {
+		if (element.options[i].text == option_name)  {
 			return;
 		} 
 	}
-	document.getElementById(id).options[length] = new Option(option_name, option_name);
+	element.options[length] = new Option(option_name, option_name);
 }
 
 function delete_option(id,option_name){

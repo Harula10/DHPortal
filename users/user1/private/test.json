@@ -1,1 +1,18 @@
-[{"code":"rt","label":"rt","parent":"None","description":"","children":[{}]},{"code":"ui","label":"ui","type":"Polynominal","group":"sg","description":"","methodology":""}]
+[
+	{
+	"code":"rt",
+	"label":"rt",
+	"parent":"None",
+	"description":"",
+	"children":[{}]
+	},
+	
+	{
+	"code":"ui",
+	"label":"ui",
+	"type":"Polynominal",
+	"group":"None",
+	"description":"",
+	"methodology":""
+	}
+]
