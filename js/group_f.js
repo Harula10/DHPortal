@@ -17,19 +17,19 @@ function initializeSVG(p){
 
 function showdetails(node){
 	var row = document.querySelectorAll("#table tr + tr");
-	if(node.methodology){ //if the node is a variable
+	if(node.group){ //if the node is a variable
 		var td = row[1].childNodes;
-		td[0].innerHTML = node.code;
-		td[1].innerHTML = node.label;
-		td[2].innerHTML = node.type;
-		td[3].innerHTML = node.methodology;
-		td[4].innerHTML = node.description;
+		td[1].innerHTML = node.code;
+		td[2].innerHTML = node.label;
+		td[4].innerHTML = node.type;
+		td[7].innerHTML = node.methodology || " ";
+		td[5].innerHTML = node.description|| " ";
 	}else{
 		var td = row[0].childNodes;
-		td[0].innerHTML = node.code;
-		td[1].innerHTML = node.label;
-		td[2].innerHTML = node.parent;
-		td[4].innerHTML = node.description;
+		td[1].innerHTML = node.code;
+		td[2].innerHTML = node.label;
+		td[4].innerHTML = node.parent;
+		td[5].innerHTML = node.description || " ";
 	}
 }
 
