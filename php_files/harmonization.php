@@ -18,6 +18,13 @@
 		<script type="text/javascript" src ="../js/functions.js"></script>
 		<script type="text/javascript" src ="../js/group_f.js"></script>
 		<script src="https://d3js.org/d3.v4.min.js"></script>
+		<style>
+			td{
+				overflow: hidden;
+				text-overflow: ellipsis;
+				white-space: nowrap;
+			}
+		</style>
 	</head>
 	<body>
 		<div id="sidenav" class="sidenav">
@@ -84,7 +91,7 @@
 					<tr>
 					<td></td><td></td> 
 					<td></td><td></td>
-					<td></td>
+					<td style="max-width:95px"></td>
 				  </tr>
 				</table>
 			</div>
@@ -95,11 +102,11 @@
 				  <tr id="title">
 					<th>Selected Variable</th>
 					<th>Match with Variable...</th>
-					<th>Using the Function...</th> 
+					<th>Using the Function(s)...</th> 
 					<th>Transform</th>
 				  </tr>
 				</table>
-				<p id="data">No Data.</p>
+				<p id="data">Load a .CSV file first.</p>
 			</div>
 			<div id="matching">
 				<button class="field_buttons" onclick="clearDataa()" type="button">Clear</button>

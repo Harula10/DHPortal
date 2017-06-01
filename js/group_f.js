@@ -7,12 +7,11 @@ var init = true;
 var svg;
 var pack;
 var color;
-var	diameter = 620;
-var page;
+var	diameter;
 
-function initializeSVG(p){
-	page = p;
-	svg = d3.select("svg").append("g").attr("transform", "translate(" + (diameter+70)/2 + "," + (diameter-50)/2 + ")");
+function initializeSVG(d){
+	diameter = d;
+	svg = d3.select("svg").append("g").attr("transform", "translate(" + (diameter)/2 + "," + (diameter)/2 + ")");
 }
 
 function showdetails(node){
@@ -22,8 +21,8 @@ function showdetails(node){
 		td[1].innerHTML = node.code;
 		td[2].innerHTML = node.label;
 		td[4].innerHTML = node.type;
-		td[7].innerHTML = node.methodology || " ";
-		td[5].innerHTML = node.description|| " ";
+		td[5].innerHTML = node.methodology || " ";
+		td[7].innerHTML = node.description|| " ";
 	}else{
 		var td = row[0].childNodes;
 		td[1].innerHTML = node.code;
@@ -257,6 +256,7 @@ function draw(){
 			.size([diameter, diameter])
 			.padding(10);
 		
+		
 	json = d3.hierarchy(json)
       .sum(function(d) { return 100; })
       .sort(function(a, b) { return b.value - a.value; });
@@ -268,7 +268,7 @@ function draw(){
 			.data(nodes)
 			.enter().append("circle")
 			.attr("class", function(d) {
-					return d.parent ? "node":"node node--root";
+				return d.parent ? "node":"node node--root";
 			})
 			.style("fill", function(d) {
 				return d.children ? color(d.depth) : '#FFF';
@@ -277,10 +277,10 @@ function draw(){
 			.text(function(d) {
 				return d.label;
 			})
-			.on("click", function(d) { 
+			.on("click", function(d) {
 				if (focus !== d){	
 					if(d.data.type){ 
-						if(page==1){
+						if(diameter==620){
 							findVar(d.data);
 						}else{
 							showdetails(d.data);
@@ -288,7 +288,7 @@ function draw(){
 						zoom(d.parent);
 					}else{ 
 						if(d.children){
-							if(page==1){
+							if(diameter==620){
 								fillformG(d.data);
 							}else{
 								showdetails(d.data);

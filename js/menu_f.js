@@ -15,7 +15,7 @@ window.onload = function(){
 		li[i].addEventListener("click",select_tab);
 	}
 	
-	initializeSVG(1);
+	initializeSVG(620);
 	var y = document.querySelectorAll(".navlink");
 	y[0].addEventListener("click",uploadJSON);
 	y[1].addEventListener("click",downloadJSON);
@@ -102,7 +102,8 @@ function shareData(folder){
 				alert(res);
 			}
 		}
-		xmlhttp.open("POST","../php_files/data_handling/file_handler.php?action=share&path="+folder+"/"+filename+".json"+"&data="+localStorage.JSONobj,true);
+		var data = encodeURIComponent(localStorage.JSONobj);
+		xmlhttp.open("GET","../php_files/data_handling/file_handler.php?action=share&path="+folder+"/"+filename+".json"+"&data="+data,true);
 		xmlhttp.send();
 	}else{
 		alert("Insert a valid name!");
@@ -211,13 +212,13 @@ function initVar(data,id,classname){
 	tr.appendChild(td);	
 	td = document.createElement("td");
 	td.innerHTML = data.group;
-	tr.appendChild(td);	
-	td = document.createElement("td");
-	td.innerHTML = data.description;
-	tr.appendChild(td);	
+	tr.appendChild(td);		
 	td = document.createElement("td");
 	td.innerHTML = data.methodology;
 	tr.appendChild(td);	
+	td = document.createElement("td");
+	td.innerHTML = data.description;
+	tr.appendChild(td);
 
 	tr.addEventListener("click",fillformV);
 	table.appendChild(tr);
@@ -228,9 +229,10 @@ function addVars(json){
         var node = json[obj]; 
 		if(node.type){
 			var_push(node,'inputfile',"uploaded");
-			codes.push(node.group);
-			add_option(document.getElementById("select"),node.group);
-			add_option(document.getElementById("select2"),node.group);
+		}else if(node.code){
+			codes.push(node.code);
+			add_option(document.getElementById("select"),node.code);
+			add_option(document.getElementById("select2"),node.code);
 		}
         if (node.children){
             var sub_json = addVars(node.children);

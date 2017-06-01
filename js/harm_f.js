@@ -1,6 +1,6 @@
 var to_match;
 window.onload = function(){	
-	initializeSVG(2);
+	initializeSVG(480);
 	var y = document.querySelectorAll(".navlink");
 	y[2].addEventListener("click",uploadCSV);
 	y[3].addEventListener("click",showload);
@@ -17,6 +17,7 @@ window.onload = function(){
 			for (var i = 0; i < to_match.length; i++){
 				initVar(to_match[i]);	
 				load_options();	
+				load_functions();
 			}
 		}
 	}else{
@@ -68,15 +69,35 @@ function shareData(folder){
 		xmlhttp.onreadystatechange=function() {
 			if (xmlhttp.readyState==4){
 				var res = xmlhttp.responseText;
-				alert(res+"/nThe file is saved with a .csv extension.");
+				alert(res+"The file is saved with a .csv extension.");
 			}
 		}
-		/*CHECK THIS AGAIN*/
-		xmlhttp.open("POST","../php_files/data_handling/file_handler.php?action=share&path="+folder+"/"+filename+".csv"+"&data="+localStorage.to_match_var,true);
+		var data = encodeURIComponent(CSVtobeTransformed());
+		xmlhttp.open("GET","../php_files/data_handling/file_handler.php?action=sharecsv&path="+folder+"/"+filename+".csv"+"&data="+data,true);
 		xmlhttp.send();
 	}else{
 		alert("Insert a valid name!");
 	}
+}
+
+function CSVtobeTransformed(){
+	var table = document.querySelectorAll("#table");
+	var str = "";
+	var new_var,old_var,func;
+	for (var i = 1, row; row = table[2].rows[i]; i++) {
+		old_var = table[2].rows[i].cells[1].firstChild.value;
+		new_var = table[2].rows[i].cells[0].innerHTML;
+		func = table[2].rows[i].cells[3].firstChild.value;
+		if(old_var!="none"){
+			str = str + old_var +","+ new_var;
+			if(func.trim()!=""){
+				str = str +","+func+"<br>";
+			}else{
+				str = str + "<br>";
+			}
+		}
+	}
+	return str;
 }
 
 function chooseFile(path){
@@ -130,6 +151,7 @@ function readCSV(){
 	}
 	//variables to match are added-now set the options
 	load_options();	
+	load_functions()
 }
 
 function load_options(){
@@ -142,6 +164,30 @@ function load_options(){
 			for (var j = 0; j < vars.length; j++){
 				add_option(variable[i],vars[j].code);
 			}
+		}
+	}
+}
+
+function load_functions(){
+	//for each new variable set the options
+	var func = document.getElementsByClassName("functions");
+	for (var i = 0; i < func.length; i++) {
+		for (var j = 0; j < functionArray.length; j++){
+			add_option(func[i],functionArray[j].name);
+		}
+	}
+}
+
+function fillTextArea(){
+	var textarea,pos,newPos,val;
+	for (var j = 0; j < functionArray.length; j++){
+		if(this.value==functionArray[j].name){
+			//add the function to where the cursor is pointing
+			textarea = document.querySelector("textarea[id='"+this.id+"']");
+			pos = textarea.selectionStart;
+			newPos = pos + functionArray[j].func_name.length;
+			val = textarea.value;
+			textarea.value = val.slice(0, pos) + functionArray[j].func_name + val.slice(pos);
 		}
 	}
 }
@@ -182,6 +228,8 @@ function initVar(data){
 	td = document.createElement("td");
 	select = document.createElement("select");
 	select.setAttribute("class","functions");
+	select.addEventListener("change",fillTextArea);
+	select.setAttribute("id",data.code);
 	option = document.createElement("option");
 	option.setAttribute("value","none");
 	option.innerHTML="Select none...";
@@ -192,7 +240,10 @@ function initVar(data){
 	
 	td = document.createElement("td");
 	text = document.createElement("textarea");
-	text.setAttribute("rows",1);
+	text.setAttribute("min-width","300px");
+	text.setAttribute("rows",2);
+	text.setAttribute("cols",40);
+	text.setAttribute("id",data.code);
 	td.appendChild(text);
 	tr.appendChild(td);	
 	table[2].appendChild(tr);

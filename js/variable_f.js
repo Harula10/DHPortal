@@ -22,7 +22,16 @@ function saveV(){
 	}
 	if(flagV){
 		if(editV()){ //deletes the old variable from table
-		//delete the old var from group
+			//deletes the variable from localStorage
+			var vars = JSON.parse(localStorage.variables);
+			for(var i = 0; i < vars.length; i++){
+				if(vars[i].code == highlighted.code){
+					vars.splice(i,1);
+					break;
+				}
+			}
+			localStorage.variables = JSON.stringify(vars);
+			//delete the old var from group
 			if(highlighted.group.trim()==""){
 				var e = document.querySelector("#select2");
 				highlighted.group = e.options[e.selectedIndex].text;
@@ -88,6 +97,10 @@ function saveV(){
 		tr.addEventListener("click",fillformV);
 		table.appendChild(tr);
 		
+		var vars = JSON.parse(localStorage.variables);
+		vars.push(variable);
+		localStorage.variables = JSON.stringify(vars);
+		
 		document.getElementById("formV").reset();
 		document.querySelector("#delV").disabled = true;
 	}
@@ -120,6 +133,16 @@ function deleteV(){
 		document.getElementById("formV").reset();
 		document.querySelector("#saveV").disabled = false;
 		document.querySelector("#delV").disabled = true;
+		
+		//delete from localstorage too
+		var vars = JSON.parse(localStorage.variables);
+			for(var i = 0; i < vars.length; i++){
+				if(vars[i].code == highlighted.code){
+					vars.splice(i,1);
+					break;
+				}
+			}
+		localStorage.variables = JSON.stringify(vars);
 		
 		var group = search(JSONobj,highlighted.group,false);
 		if(group){

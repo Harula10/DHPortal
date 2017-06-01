@@ -17,6 +17,14 @@
 		<script type="text/javascript" src ="../js/group_f.js"></script>
 		<script type="text/javascript" src ="../js/menu_f.js"></script>
 		<script src="https://d3js.org/d3.v4.min.js"></script>
+		<style>
+			td {
+				max-width: 200px;
+				overflow: hidden;
+				text-overflow: ellipsis;
+				white-space: nowrap;
+			}
+		</style>
 	</head>
 	<body>
 		<div id="sidenav" class="sidenav">

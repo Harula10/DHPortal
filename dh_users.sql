@@ -57,19 +57,20 @@ CREATE TABLE `users` (
   `username` varchar(15) NOT NULL,
   `email` varchar(50) NOT NULL,
   `password` varchar(50) NOT NULL
+  `rights` int NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 --
 -- Άδειασμα δεδομένων του πίνακα `users`
---
+-- rights: 0: users, 1: admin
 
-INSERT INTO `users` (`username`, `email`, `password`) VALUES
-('user1', 'user1@live.com', 'user1'),
-('user2', 'user2@gmail.com', 'user2'),
-('user3', 'user3@live.com', 'user3'),
-('user4', 'user4@live.com', 'user4'),
-('user5', 'user5@live.com', 'user5'),
-('user6', 'user6@live.com', 'user6');
+INSERT INTO `users` (`username`, `email`, `password`, `rights`) VALUES
+('user1', 'user1@live.com', 'user1',0),
+('user2', 'user2@gmail.com', 'user2',1),
+('user3', 'user3@live.com', 'user3',0),
+('user4', 'user4@live.com', 'user4',0),
+('user5', 'user5@live.com', 'user5',0),
+('user6', 'user6@live.com', 'user6',1);
 
 --
 -- Ευρετήρια για άχρηστους πίνακες
