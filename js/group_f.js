@@ -57,7 +57,6 @@ function changeAttrG(){
 function deleteG(){
 	if (confirm("Are you sure you want to delete this group?")) {
 		codes.splice(codes.indexOf(selected.label), 1);
-		clearTable(selected.label);
 		var found = search(JSONobj,selected,true);
 		if(found){
 			for(var i = 0; i < found.children.length;i++){
@@ -77,6 +76,7 @@ function deleteG(){
 				}
 			}
 		}
+		clearTable(selected.label);
 		delete_option("select",selected.label);
 		delete_option("select2",selected.label);
 		document.getElementById("formG").reset();	
@@ -88,10 +88,11 @@ function clearTable(label){
 	var table = document.getElementById("table").rows;
 	for(var i = 1; i < table.length ; i++ ){
 		if(table[i].cells[3].innerHTML == label){
-			table[i].className = 'new';
+			table[i].className = 'ungrouped';
 			table[i].cells[3].innerHTML = "";
 		}
 	}
+	update(label,"", "ungrouped");
 }
 
 function hasgroupchild(json,selected){
@@ -145,9 +146,19 @@ function editG(){
 					JSONobj[i].code = node.code;
 					JSONobj[i].label = node.label;
 					JSONobj[i].description = node.description;
+					node.children = [];
+					old = JSONobj[i].children.slice();
+					for(var j = 0; j < old.length;j++){
+						old[j].group = node.label;
+					}
+					node.children = old.slice();
 				}else{
 					node.children = [];
-					node.children = JSONobj[i].children.slice();
+					old = JSONobj[i].children.slice();
+					for(var j = 0; j < old.length;j++){
+						old[j].group = node.label;
+					}
+					node.children = old.slice();
 					JSONobj.splice(i, 1);
 					found = search(JSONobj,node,true); //search the new parent and insert the edited node
 					found.children.push(node);
@@ -164,10 +175,20 @@ function editG(){
 					found.children[i].code = node.code;
 					found.children[i].label = node.label;
 					found.children[i].description = node.description;
+					node.children = [];
+					old = found.children[i].children.slice();
+					for(var j = 0; j < old.length;j++){
+						old[j].group = node.label;
+					}
+					node.children = old.slice();
 				}else{
 					node.children = [];
-					node.children = found.children[i].children.slice();
-					found.children.splice(i, 1);
+					old = found.children[i].children.slice();
+					for(var j = 0; j < old.length;j++){
+						old[j].group = node.label;
+					}
+					node.children = old.slice();
+					JSONobj.splice(i, 1);
 					var par = search(JSONobj,node,true); //search the new parent and insert the edited node
 					if(par){
 						par.children.push(node);
@@ -181,9 +202,41 @@ function editG(){
 			}
 		}
 	}
+	//edit the group from the variables too
+	var table = document.getElementById("table");
+	for(var i = 1; i < table.rows.length; i++){
+		if(table.rows[i].cells[3].innerHTML==selected.label){ //find the variables whose group is edited
+			table.rows[i].cells[3].innerHTML=groups[1].value; //change their group label
+			//delete the variable
+			update(selected.label,groups[1].value, "grouped");
+		}
+	}
+	
 	delete_option("select",selected.label);
 	delete_option("select2",selected.label);
 	flag = false;
+}
+
+function update(old_label, new_label,classname){
+	var vars = JSON.parse(localStorage.variables);
+	for(var i = 0; i < vars.length; ){
+		if(vars[i].group == old_label){
+			var variable = {
+				"code" : vars[i].code,
+				"label" : vars[i].label,
+				"type" : vars[i].type,
+				"group" : new_label,
+				"description" : vars[i].description,
+				"methodology" : vars[i].methodology,
+				"classname" : classname
+			};	
+			vars.push(variable);
+			vars.splice(i,1);
+		}else{
+			i++;
+		}
+	}
+	localStorage.variables = JSON.stringify(vars);
 }
 
 function saveG(){

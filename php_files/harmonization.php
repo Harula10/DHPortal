@@ -39,14 +39,14 @@
 				<li><input type="file" onchange="getFile()"  accept=".csv" id="inputfilecsv"/><a class="navlink">Upload Variables(CSV)</a></li>
 				<br><br>
 				<div class="dropdown">
-					<li><a class="navlink">Load meta-data</a></li>
+					<li><a class="navlink">Load variables(CSV)</a></li>
 					<div class="dropdown-content" onmouseout="hidemenu(0)">
 						<a onclick="loadData('private')" onmouseover="showload()">From your private folder...</a>
 						<a onclick="loadData('public')" onmouseover="showload()">From your public folder...</a>
 					</div>
 				</div><br>
 				<div class="dropdown">
-					<li><a class="navlink">Save meta-data</a></li>
+					<li><a class="navlink">Save variables(CSV)</a></li>
 					<div class="dropdown-content" onmouseout="hidemenu(1)">
 						<a onclick="shareData('private')" onmouseover="showshare()">To your private folder...</a>
 						<a onclick="shareData('public')" onmouseover="showshare()">To your public folder...</a>
