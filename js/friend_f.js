@@ -58,6 +58,7 @@ function chooseFFile(path){ //../users/user2/public/meta-dataaaa.json
 			var allText = file.responseText;
 			if(path.includes(".json")){
 				localStorage.JSONobj = allText;
+				localStorage.load_fromFriend = true;
 				window.location.href = "home.php";
 			}else if(path.includes(".csv")){
 				//split each row of csv file

@@ -191,7 +191,7 @@ h2{
 #varbar li {
 	float: left;
 	position: relative;
-	width: 33%;
+	width: 25%;
 	transition: .2s;
 }
 
@@ -309,11 +309,11 @@ table {
 }
 
 .highlight{
-	background-color: #e6f7ff;
+	background-color: hsl(152,80%,80%) !important;
 }
 
-.user{
-	background-color: hsl(152,80%,80%);
+.friends{
+	background-color: #e6f7ff;
 }
 
 #title{

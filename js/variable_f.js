@@ -45,11 +45,13 @@ function saveV(){
 				}
 			}else{
 				var group = search(JSONobj,highlighted.group,false);
-				for(var i = 0; i < group.children.length;i++){
-					if(group.children[i].code == highlighted.code){ 
-						group.children.splice(i, 1);
-						if(!group.children[0]) group.children.push({});
-						break;
+				if(group){ //if the edited variable had a group that existed in the current json
+					for(var i = 0; i < group.children.length;i++){
+						if(group.children[i].code == highlighted.code){ 
+							group.children.splice(i, 1);
+							if(!group.children[0]) group.children.push({});
+							break;
+						}
 					}
 				}
 			}
@@ -63,7 +65,7 @@ function saveV(){
 		document.getElementById("data").style.visibility = "hidden";
 		var table = document.querySelector("#table");	
 		var tr = document.createElement("tr");
-		tr.setAttribute("class", "new"); //not uploaded ones
+		tr.setAttribute("class", "new"); 
 		
 		for(var i = 0; i < 4; i++){
 			var td = document.createElement("td");
@@ -87,6 +89,7 @@ function saveV(){
 		}else{
 			JSONobj.push(variable);
 		}
+		localStorage.JSONobj = JSON.stringify(JSONobj);
 		draw();
 		var td = document.createElement("td");
 		td.innerHTML = new_vars[5].value;
@@ -97,6 +100,7 @@ function saveV(){
 		tr.addEventListener("click",fillformV);
 		table.appendChild(tr);
 		
+		variable["classname"] = "new";
 		var vars = JSON.parse(localStorage.variables);
 		vars.push(variable);
 		localStorage.variables = JSON.stringify(vars);
@@ -205,7 +209,8 @@ function findVar(e){
 				"type" : vars[2].value,
 				"group" : vars[3].value,
 				"description" : vars[4].value,
-				"methodology" : vars[5].value
+				"methodology" : vars[5].value,
+				"classname" : table.rows[i].className
 			}
 			highlight();
 			break;
@@ -248,7 +253,8 @@ function fillformV(e){
 		"type" : vars[2].value,
 		"group" : vars[3].value,
 		"description" : vars[4].value,
-		"methodology" : vars[5].value
+		"methodology" : vars[5].value,
+		"classname" : document.getElementById("table").rows[index].className
 	}
 }
 
@@ -271,16 +277,22 @@ function select_tab(e){
 	for(var i = 0; i<tr.length; i++){
 		tr[i].style.display = "table-row";
 	}
-	if(e.target.innerHTML=="New"){
-		var tr = document.getElementsByClassName("uploaded");
-		for(var i = 0; i<tr.length; i++){
-			tr[i].style.display = "none";
-		}
-	}else if(e.target.innerHTML=="Uploaded"){
-		var tr = document.getElementsByClassName("new");
-		for(var i = 0; i<tr.length; i++){
-			tr[i].style.display = "none";
-		}
+	if(e.target.innerHTML=="Ungrouped"){
+		hideTR("grouped");
+		hideTR("new");
+	}else if(e.target.innerHTML=="Grouped"){
+		hideTR("ungrouped");
+		hideTR("new");
+	}else if(e.target.innerHTML=="Recent"){
+		hideTR("grouped");
+		hideTR("ungrouped");
+	}
+}
+
+function hideTR(classname){
+	var tr = document.getElementsByClassName(classname);
+	for(var i = 0; i<tr.length; i++){
+		tr[i].style.display = "none";
 	}
 }
 

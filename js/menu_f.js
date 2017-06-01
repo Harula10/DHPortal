@@ -27,7 +27,7 @@ window.onload = function(){
 	if(localStorage.variables){
 		vars = JSON.parse(localStorage.variables);
 		for (var i = 0; i < vars.length; i++){
-			initVar(vars[i],'inputfilecsv','uploaded');	
+			initVar(vars[i],'inputfilecsv');	
 		}
 	}else{
 		vars = [];
@@ -35,7 +35,12 @@ window.onload = function(){
 	
 	if(localStorage.JSONobj){
 		JSONobj = JSON.parse(localStorage.JSONobj);
-		addVars(JSONobj,'uploaded');
+		if(localStorage.load_fromFriend){
+			addVars(JSONobj,"grouped friends");
+		}else{
+			addVars(JSONobj,"grouped");
+			localStorage.load_fromFriend = false;
+		}
 		draw();
 	}else{
 		JSONobj = [];
@@ -43,7 +48,7 @@ window.onload = function(){
 	
 	if(localStorage.csv){
 		rows = localStorage.csv.split("\n");
-		readCSV();
+		readCSV("ungrouped friends");
 		localStorage.removeItem("csv");
 	}
 }
@@ -103,11 +108,24 @@ function shareData(folder){
 			}
 		}
 		var data = encodeURIComponent(localStorage.JSONobj);
-		xmlhttp.open("GET","../php_files/data_handling/file_handler.php?action=share&path="+folder+"/"+filename+".json"+"&data="+data,true);
+		xmlhttp.open("GET","../php_files/data_handling/file_handler.php?action=share&path="+folder+"/"+filename+".json"+"&data="+cleanJSON(data),true);
 		xmlhttp.send();
 	}else{
 		alert("Insert a valid name!");
 	}
+}
+
+function cleanJSON(json){
+	for (obj in json){
+        var node = json[obj]; 
+		if(node.classname){
+			delete node.classname;
+		}
+        if (node.children){
+            var sub_json = cleanJSON(node.children);
+        }
+    }
+	return json;
 }
 
 function chooseFile(path){
@@ -120,7 +138,7 @@ function chooseFile(path){
 			if(path.includes(".json")){
 				localStorage.JSONobj = allText;
 				JSONobj = JSON.parse(localStorage.JSONobj);
-				addVars(JSONobj,'uploaded');
+				addVars(JSONobj,"grouped");
 				draw();
 			}else if(path.includes(".csv")){
 				//split each row of csv file
@@ -145,19 +163,19 @@ function getFile(id){
 			var result = JSON.parse(fr.result);
 			JSONobj = result.slice();
 			//find all the variables and add them to array
-			addVars(JSONobj,'uploaded');
+			addVars(JSONobj,"grouped");
 			draw();
 		}else{
 			//split each row of csv file
 			rows = fr.result.split("\n");
-			readCSV();
+			readCSV("new");
 		}
 		
 	}
 	fr.readAsText(files.item(0));
 }
 
-function readCSV(){
+function readCSV(classname){
 	for (var i = 1; i < rows.length-1; i++) {
 		var cells = rows[i].split(";");
 		if(cells[2].trim()!="Polynominal" && cells[2].trim()!="Binominal" && cells[2].trim()!="Real" ){
@@ -171,12 +189,13 @@ function readCSV(){
 			"group" : "",
 			"description" : cells[3],
 			"methodology" : cells[4],
+			"classname" :  classname
 		};
-		var_push(variable,'inputfilecsv',"new");
+		var_push(variable,'inputfilecsv');
 	}
 }
 
-function var_push(data,id,classname){
+function var_push(data,id){
 	var f = true;
 	for (var i = 0; i < vars.length; i++) { //if a variable already exists
 		if (vars[i].code == data.code && vars[i].group == data.group ) { //don't add it in array
@@ -186,11 +205,11 @@ function var_push(data,id,classname){
 	if(f){ //if it doesn't exists add it in array AND table
 		vars.push(data);
 		localStorage.variables = JSON.stringify(vars);
-		initVar(data,id,classname);
+		initVar(data,id);
 	}
 }
 
-function initVar(data,id,classname){
+function initVar(data,id){
 	document.getElementById("data").style.visibility = "hidden";
 	var table = document.querySelector("#table");	
 	var tr = document.createElement("tr");
@@ -199,8 +218,11 @@ function initVar(data,id,classname){
 		add_option(document.getElementById("select2"),data.group);
 	}
 
-	tr.setAttribute("class", classname); //uploaded or new ones
-	
+	if(data.classname)
+		tr.setAttribute("class", data.classname); //uploaded or new ones
+	else
+		tr.setAttribute("class", "grouped");
+		
 	var td = document.createElement("td");
 	td.innerHTML = data.code;
 	tr.appendChild(td);	
@@ -224,18 +246,19 @@ function initVar(data,id,classname){
 	table.appendChild(tr);
 }
 
-function addVars(json){
+function addVars(json,classname){
 	for (obj in json){
         var node = json[obj]; 
 		if(node.type){
-			var_push(node,'inputfile',"uploaded");
+			node["classname"]=classname;
+			var_push(node,'inputfile');
 		}else if(node.code){
 			codes.push(node.code);
 			add_option(document.getElementById("select"),node.code);
 			add_option(document.getElementById("select2"),node.code);
 		}
         if (node.children){
-            var sub_json = addVars(node.children);
+            var sub_json = addVars(node.children,classname);
         }
     }
 }
