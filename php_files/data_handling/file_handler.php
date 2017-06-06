@@ -26,10 +26,9 @@
 		$path = "../users/".$_SESSION["logged_user"]."/".$folder;
 		$file = fopen("../".$path,"w");
 		$lines = explode("<br>", $data); 
-		for ($i = 0; $i < sizeof($lines); $i++) {
+		for ($i = 0; $i < count($lines); $i++) {
 			//split each $lines[$i] 3 times. the third one use a function to edit
 			//the transformation
-		
             fwrite($file,$lines[$i]."\n");
         }
 		fclose($file);

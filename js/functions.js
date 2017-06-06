@@ -1,6 +1,6 @@
 var functionArray = [        
         {"name" : "Abs", "hint" : "Returns the absolute value of same type for Numbers / returns the Modulus for Complex", "func_name" : "abs(x)"},
-        {"name" : "Aggregate Function", "hint" : "Execute an aggregation function", "func_name" : "aggregation(\"function\",\"attribute parameters\")"},
+        {"name" : "Aggregate Function", "hint" : "Execute an aggregation function", "func_name" : "aggregation('function','attribute parameters')"},
         {"name" : "Append", "hint" : "Appends second parameter to first paramenter as string", "func_name" : "append(str1, str2)"},
         {"name" : "Arc Cosine", "hint" : "Inverse Cosine", "func_name" : "acos(x)"},
         {"name" : "Arc Cosine Hyperbolic", "hint" : "Inverse Hyperbolic Cosine", "func_name" : "acosh(x)"},
@@ -34,7 +34,6 @@ var functionArray = [
         {"name" : "Log", "hint" : "Logarithm base 10", "func_name" : "log(x)"},
         {"name" : "Ln", "hint" : "Natural Logarithm", "func_name" : "ln(x)"},
         {"name" : "Modulus", "hint" : "Calculates the modulus x % y of the arguments", "func_name" : "mod(x,y)"},
-        {"name" : "New Id", "hint" : "Gets the next number in a sequence", "func_name" : "newId()"},
         {"name" : "Null", "hint" : "Returns null value", "func_name" : "null()"},
         {"name" : "Polar", "hint" : "Constructs a complex number from modulus and argument", "func_name" : "polar(r, theta)"},
         {"name" : "Power", "hint" : "Computes the power of an number", "func_name" : "pow(x,y)"},

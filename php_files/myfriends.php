@@ -33,7 +33,7 @@
 				<li class="disabled"><a class="navlink"><font color="gray">Load meta-data</font></a></li>
 				<li class="disabled"><a class="navlink"><font color="gray">Save meta-data</font></a></li>
 				<br><br><br>
-				<li><a href="logout.php">Log out</a></li>
+				<li><a href="logout.php" onclick="clearStorage()">Log out</a></li>
 			</ul>
 		</div>
 		<div id="folders">

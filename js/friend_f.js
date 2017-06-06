@@ -72,3 +72,7 @@ function chooseFFile(path){ //../users/user2/public/meta-dataaaa.json
     }
     file.send(null);
 }
+
+function clearStorage(){
+	localStorage.clear();
+}

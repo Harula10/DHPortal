@@ -64,6 +64,7 @@ function loadData(folder){
 
 function shareData(folder){
 	var filename = prompt("Save as...");
+	var data = encodeURIComponent(CSVtobeTransformed().trim());
 	if (filename != null) {
 		var	xmlhttp = new XMLHttpRequest();
 		xmlhttp.onreadystatechange=function() {
@@ -72,14 +73,12 @@ function shareData(folder){
 				alert(res+"The file is saved with a .csv extension.");
 			}
 		}
-		var data = encodeURIComponent(CSVtobeTransformed());
 		xmlhttp.open("GET","../php_files/data_handling/file_handler.php?action=sharecsv&path="+folder+"/"+filename+".csv"+"&data="+data,true);
 		xmlhttp.send();
-	}else{
-		alert("Insert a valid name!");
 	}
 }
 
+var _func="";
 function CSVtobeTransformed(){
 	var table = document.querySelectorAll("#table");
 	var str = "";
@@ -90,14 +89,32 @@ function CSVtobeTransformed(){
 		func = table[2].rows[i].cells[3].firstChild.value;
 		if(old_var!="none"){
 			str = str + old_var +","+ new_var;
-			if(func.trim()!=""){
-				str = str +","+func+"<br>";
+			//Transform function
+			transform(func.trim());
+			if(_func!=""){
+				str = str +","+_func+"<br>";
 			}else{
 				str = str + "<br>";
 			}
 		}
 	}
 	return str;
+}
+
+function transform(_function){
+	var	xmlhttp = new XMLHttpRequest();
+	xmlhttp.onreadystatechange=function() {
+		if (xmlhttp.readyState==4){
+			var transformed_func = xmlhttp.responseText;
+			setFunc(transformed_func);
+		}
+	}
+	xmlhttp.open("GET","../php_files/data_handling/func_transform.php?&func="+encodeURIComponent(_function),false);
+	xmlhttp.send();
+}
+
+function setFunc(_function){
+	_func = _function;
 }
 
 function chooseFile(path){
@@ -259,6 +276,10 @@ function addVars(json){
             var sub_json = addVars(node.children);
         }
     }
+}
+
+function clearStorage(){
+	localStorage.clear();
 }
 
 function clearDataa(){
