@@ -14,7 +14,7 @@ function search(){
 			
 		}
 	}
-	xmlhttp.open("GET","requests_handler.php?action=search&search="+search.value,true);
+	xmlhttp.open("GET","../php_files/data_handling/requests_handler.php?action=search&search="+search.value,true);
 	xmlhttp.send();
 }
 	
@@ -30,7 +30,7 @@ function request(search){
 			}
 		}
 	}
-	xmlhttp.open("GET","requests_handler.php?action=request&search="+search,true);
+	xmlhttp.open("GET","../php_files/data_handling/requests_handler.php?action=request&search="+search,true);
 	xmlhttp.send();
 }
 
