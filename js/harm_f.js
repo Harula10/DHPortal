@@ -81,7 +81,7 @@ function shareData(folder){
 var _func="";
 function CSVtobeTransformed(){
 	var table = document.querySelectorAll("#table");
-	var str = "";
+	var str = "Old_var,New_var,Transformation<br>";
 	var new_var,old_var,func;
 	for (var i = 1, row; row = table[2].rows[i]; i++) {
 		old_var = table[2].rows[i].cells[1].firstChild.value;
