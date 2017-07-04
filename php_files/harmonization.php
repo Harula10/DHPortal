@@ -102,8 +102,15 @@
 				  <tr id="title">
 					<th>Selected Variable</th>
 					<th>Match with Variable...</th>
-					<th>Using the Function(s)...</th> 
+					<th>Using the Function(s)...</th>
 					<th>Transform</th>
+					<th>Format</th>
+					<th>Missing Timestamp</th>
+					<th>Subject Ref.</th>
+					<th>Pseudonymization</th>
+					<th>Type</th>
+					<th>Unit</th>
+					<th>Range</th>
 				  </tr>
 				</table>
 				<p id="data">Load a .CSV file first.</p>

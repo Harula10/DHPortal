@@ -73,7 +73,7 @@ function shareData(folder){
 				alert(res+"The file is saved with a .csv extension.");
 			}
 		}
-		xmlhttp.open("GET","../php_files/data_handling/file_handler.php?action=sharecsv&path="+folder+"/"+filename+".csv"+"&data="+data,true);
+		xmlhttp.open("POST","../php_files/data_handling/file_handler.php?action=sharecsv&path="+folder+"/"+filename+".csv"+"&data="+data,true);
 		xmlhttp.send();
 	}
 }
@@ -81,14 +81,22 @@ function shareData(folder){
 var _func="";
 function CSVtobeTransformed(){
 	var table = document.querySelectorAll("#table");
-	var str = "Old_var,New_var,Transformation<br>";
-	var new_var,old_var,func;
+	var str = "Old_var;New_var;Format; Missing Timestamp; Subject Ref.;Pseudonymization; Type; Unit; Range; Transformation<br>";
+	var new_var,old_var,format,timestamp,ref,pseudo,type,unit,range,func;
 	for (var i = 1, row; row = table[2].rows[i]; i++) {
 		old_var = table[2].rows[i].cells[1].firstChild.value;
 		new_var = table[2].rows[i].cells[0].innerHTML;
+		format = table[2].rows[i].cells[4].firstChild.value;
+		timestamp = table[2].rows[i].cells[5].firstChild.value;
+		ref = table[2].rows[i].cells[6].firstChild.value;
+		pseudo = table[2].rows[i].cells[7].firstChild.value;
+		type = table[2].rows[i].cells[8].firstChild.value;
+		unit = table[2].rows[i].cells[9].firstChild.value;
+		range = table[2].rows[i].cells[10].firstChild.value;
 		func = table[2].rows[i].cells[3].firstChild.value;
 		if(old_var!="none"){
-			str = str + old_var +","+ new_var;
+			str = str + old_var +";"+ new_var +";"+ format +";"+ timestamp +";"+ ref +";"+ pseudo +";"+ type 
+						+";"+ unit +";"+ range;
 			//Transform function
 			transform(func.trim());
 			if(_func!=""){
@@ -225,13 +233,15 @@ function var_push(data){
 
 function initVar(data){
 	document.getElementById("data").style.visibility = "hidden";
+	//New Variable
 	var table = document.querySelectorAll("#table");	
-	var tr = document.createElement("tr");	//<td>to_matched variable code</td>
+	var tr = document.createElement("tr");	
 	var td = document.createElement("td");
 	td.innerHTML = data.code;
 	tr.appendChild(td);	
 	
-	td = document.createElement("td");
+	//Old Variable
+	td = document.createElement("td"); 
 	var select = document.createElement("select");
 	select.setAttribute("class","match-with");
 	var option = document.createElement("option");
@@ -241,7 +251,7 @@ function initVar(data){
 	td.appendChild(select);
 	tr.appendChild(td);	
 	
-	
+	//Functions
 	td = document.createElement("td");
 	select = document.createElement("select");
 	select.setAttribute("class","functions");
@@ -254,16 +264,52 @@ function initVar(data){
 	td.appendChild(select);
 	tr.appendChild(td);	
 	
+	//Transformation
+	tr.appendChild(createTXTArea(data.code,"300px",40));
 	
+	//Format
+	tr.appendChild(createTXTArea("","100px",20));
+	//Missing Timestamp
+	tr.appendChild(createTXTArea("","100px",20));
+	//Subject Ref.
+	tr.appendChild(createTXTArea("","100px",20));
+	//Pseudonymization
+	tr.appendChild(createTXTArea("","100px",20));
+	//Type
 	td = document.createElement("td");
-	text = document.createElement("textarea");
-	text.setAttribute("min-width","300px");
-	text.setAttribute("rows",2);
-	text.setAttribute("cols",40);
-	text.setAttribute("id",data.code);
-	td.appendChild(text);
+	select = document.createElement("select");
+	select.setAttribute("class","type");
+	option = document.createElement("option");
+	option.innerHTML="Polynominal";
+	select.appendChild(option);
+	option = document.createElement("option");
+	option.innerHTML="Binominal";
+	select.appendChild(option);
+	option = document.createElement("option");
+	option.innerHTML="Real";
+	select.appendChild(option);
+	option = document.createElement("option");
+	option.innerHTML="Integer";
+	select.appendChild(option);
+	td.appendChild(select);
 	tr.appendChild(td);	
+	//Unit
+	tr.appendChild(createTXTArea("","100px",20));
+	//Range
+	tr.appendChild(createTXTArea("","100px",20));
+	
 	table[2].appendChild(tr);
+}
+
+function createTXTArea(code,width,cols){
+	var td = document.createElement("td");
+	var text = document.createElement("textarea");
+	text.setAttribute("min-width",width);
+	text.setAttribute("rows",2);
+	text.setAttribute("cols",cols);
+	text.setAttribute("id",code);
+	td.appendChild(text);
+	return td;
 }
 
 function addVars(json){

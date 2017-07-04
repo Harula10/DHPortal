@@ -1,0 +1,4 @@
+Old_var;New_var;Format; Missing Timestamp; Subject Ref.;Pseudonymization; Type; Unit; Range; Transformation
+ui;var 20;NA;NA;;;Integer;;;abs(cast(x as float))-10
+ui;var 19;;NA;NA;;Binominal;;;str1||str2
+
