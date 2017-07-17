@@ -139,6 +139,7 @@ function editG(){
 	};		
 	codes[selected.label] = node.label;
 	var found = search(JSONobj,selected,true);
+	var old;
 	if(!found){ //if the parent is the root
 		for(var i = 0; i < JSONobj.length;i++){
 			if(JSONobj[i].code == selected.code){ //we found the child we should delete
@@ -171,7 +172,7 @@ function editG(){
 	}else{ //if the parent is a node
 		for(var i = 0; i < found.children.length;i++){
 			if(found.children[i].code == selected.code){ //we found the child we should delete
-				if(found.children[i].parent == node.parent){
+				if(found.children[i].parent == node.parent){//the parent is not changed
 					found.children[i].code = node.code;
 					found.children[i].label = node.label;
 					found.children[i].description = node.description;
@@ -181,39 +182,35 @@ function editG(){
 						old[j].group = node.label;
 					}
 					node.children = old.slice();
-				}else{
-					node.children = [];
-					old = found.children[i].children.slice();
-					for(var j = 0; j < old.length;j++){
-						old[j].group = node.label;
-					}
-					node.children = old.slice();
-					JSONobj.splice(i, 1);
+				}else{ //if we change the parent then:
+					//create a child for the new node
+					node.children = found.children[i].children.slice(); //copy the old node's children and add them to the new one
+					found.children.splice(i, 1);
 					var par = search(JSONobj,node,true); //search the new parent and insert the edited node
 					if(par){
 						par.children.push(node);
-						if(JSON.stringify(par.children[0], null, ' ')=="{}")
-							par.children.splice(0, 1);
 					}else{
 						JSONobj.push(node);
 					}
 				}
+				console.log(JSONobj);
 				break;
 			}
 		}
 	}
 	//edit the group from the variables too
-	var table = document.getElementById("table");
-	for(var i = 1; i < table.rows.length; i++){
-		if(table.rows[i].cells[3].innerHTML==selected.label){ //find the variables whose group is edited
-			table.rows[i].cells[3].innerHTML=groups[1].value; //change their group label
-			//delete the variable
-			update(selected.label,groups[1].value, "grouped");
+	if(selected.label!=groups[1].value){
+		var table = document.getElementById("table");
+		for(var i = 1; i < table.rows.length; i++){
+			if(table.rows[i].cells[3].innerHTML==selected.label){ //find the variables whose group is edited
+				table.rows[i].cells[3].innerHTML=groups[1].value; //change their group label
+				//delete the variable
+				update(selected.label,groups[1].value, "grouped");
+			}
 		}
+		delete_option("select",selected.label);
+		delete_option("select2",selected.label);
 	}
-	
-	delete_option("select",selected.label);
-	delete_option("select2",selected.label);
 	flag = false;
 }
 

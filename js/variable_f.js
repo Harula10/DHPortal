@@ -47,7 +47,6 @@ function saveV(){
 				var group = search(JSONobj,highlighted.group,false);
 				if(group){ //if the edited variable had a group that existed in the current json
 					for(var i = 0; i < group.children.length;i++){
-						alert(group.children[i].code+","+highlighted.code);
 						if(group.children[i].code == highlighted.code){ 
 							group.children.splice(i, 1);
 							if(!group.children[0]) group.children.push({});
