@@ -1,0 +1,5 @@
+var 0,var A,aggregation("sum","attribute parameters")
+var 3,var V,append("test", "value")
+var 3,var R,acos(10) + asin(10)
+var 056,var J
+

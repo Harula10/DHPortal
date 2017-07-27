@@ -237,7 +237,7 @@ h2{
 	display: block;
 	margin-right: 0.5%;
 	margin-bottom: 2%;
-	text-align: vertical;
+	/*text-align: vertical;*/
 }
 
 #groups{

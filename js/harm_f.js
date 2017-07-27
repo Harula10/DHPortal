@@ -25,7 +25,7 @@ window.onload = function(){
 	}
 }
 
-function uploadCSV(){
+function uploadCSV(event){
 	event.preventDefault();
 	document.getElementById("inputfilecsv").click();	
 }
@@ -81,22 +81,23 @@ function shareData(folder){
 var _func="";
 function CSVtobeTransformed(){
 	var table = document.querySelectorAll("#table");
-	var str = "Old_var;New_var;Format; Missing Timestamp; Subject Ref.;Pseudonymization; Type; Unit; Range; Transformation<br>";
+	var str = "Old_attr;New_attr;Format; Missing Timestamp; Subject Ref.;Pseudonymization; Type; Unit; Range; Function<br>";
 	var new_var,old_var,format,timestamp,ref,pseudo,type,unit,range,func;
 	for (var i = 1, row; row = table[2].rows[i]; i++) {
-		old_var = table[2].rows[i].cells[1].firstChild.value;
-		new_var = table[2].rows[i].cells[0].innerHTML;
-		format = table[2].rows[i].cells[4].firstChild.value;
-		timestamp = table[2].rows[i].cells[5].firstChild.value;
-		ref = table[2].rows[i].cells[6].firstChild.value;
-		pseudo = table[2].rows[i].cells[7].firstChild.value;
-		type = table[2].rows[i].cells[8].firstChild.value;
-		unit = table[2].rows[i].cells[9].firstChild.value;
-		range = table[2].rows[i].cells[10].firstChild.value;
+		old_var = "\""+table[2].rows[i].cells[1].firstChild.value+"\"";
+		new_var = "\""+table[2].rows[i].cells[0].innerHTML+"\"";
+		format = "\""+table[2].rows[i].cells[4].firstChild.value+"\"";
+		timestamp = "\""+table[2].rows[i].cells[5].firstChild.value+"\"";
+		ref = "\""+table[2].rows[i].cells[6].firstChild.value+"\"";
+		pseudo = "\""+table[2].rows[i].cells[7].firstChild.value+"\"";
+		type = "\""+table[2].rows[i].cells[8].firstChild.value+"\"";
+		unit = "\""+table[2].rows[i].cells[9].firstChild.value+"\"";
+		range = "\""+table[2].rows[i].cells[10].firstChild.value+"\"";
 		func = table[2].rows[i].cells[3].firstChild.value;
-		if(old_var!="none"){
-			str = str + old_var +";"+ new_var +";"+ format +";"+ timestamp +";"+ ref +";"+ pseudo +";"+ type 
-						+";"+ unit +";"+ range;
+		if(old_var!="\"none\""){
+			if(type=="\"none\"") type = "\"\"";
+			str = str + old_var +","+ new_var +","+ format +","+ timestamp +","+ ref +","+ pseudo +","+ type 
+						+","+ unit +","+ range;
 			//Transform function
 			transform(func.trim());
 			if(_func!=""){
@@ -279,6 +280,10 @@ function initVar(data){
 	td = document.createElement("td");
 	select = document.createElement("select");
 	select.setAttribute("class","type");
+	option = document.createElement("option");
+	option.setAttribute("value","none");
+	option.innerHTML="Select none...";
+	select.appendChild(option);
 	option = document.createElement("option");
 	option.innerHTML="Polynominal";
 	select.appendChild(option);

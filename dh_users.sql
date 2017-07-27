@@ -56,7 +56,7 @@ INSERT INTO `friendships` (`from_user`, `to_user`) VALUES
 CREATE TABLE `users` (
   `username` varchar(15) NOT NULL,
   `email` varchar(50) NOT NULL,
-  `password` varchar(50) NOT NULL
+  `password` varchar(50) NOT NULL,
   `rights` int NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 

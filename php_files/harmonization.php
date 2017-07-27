@@ -36,7 +36,7 @@
 				<br><br><br>
 				<li class="disabled"><a class="navlink"><font color="gray">Upload meta-data(JSON)</font></a></li>
 				<li class="disabled"><a class="navlink"><font color="gray">Download meta-data(JSON)</font></a></li>
-				<li><input type="file" onchange="getFile()"  accept=".csv" id="inputfilecsv"/><a class="navlink">Upload Variables(CSV)</a></li>
+				<li><input type="file" onchange="getFile('inputfilecsv')"  accept=".csv" id="inputfilecsv"/><a class="navlink">Upload Variables(CSV)</a></li>
 				<br><br>
 				<div class="dropdown">
 					<li><a class="navlink">Load variables(CSV)</a></li>

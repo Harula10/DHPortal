@@ -53,18 +53,18 @@ window.onload = function(){
 	}
 }
 
-function downloadJSON(){
+function downloadJSON(event){
 	var data = "text/json;charset=utf-8," + encodeURIComponent(localStorage.JSONobj);
 	event.target.href = 'data:' + data;
 	event.target.download = 'meta-data.json';
 }
 
-function uploadJSON(){
+function uploadJSON(event){
 	event.preventDefault();
 	document.getElementById("inputfile").click();	
 }
 
-function uploadCSV(){
+function uploadCSV(event){
 	event.preventDefault();
 	document.getElementById("inputfilecsv").click();	
 }

@@ -1,13 +1,9 @@
-[
+
 	{
 	"code":"rt",
 	"label":"rt",
 	"parent":"None",
-	"description":"",
-	"children":[{}]
-	},
 	
-	{
 	"code":"ui",
 	"label":"ui",
 	"type":"Polynominal",
@@ -15,4 +11,3 @@
 	"description":"",
 	"methodology":""
 	}
-]

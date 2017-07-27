@@ -1,0 +1,4 @@
+Old_attr;New_attr;Format; Missing Timestamp; Subject Ref.;Pseudonymization; Type; Unit; Range; Function
+var 1,var 20,,,,,Polynominal,,,"aggregation(sum,x==a|>b)"
+var 056,var 19,,,,,Polynominal,,,"str1||str2"
+

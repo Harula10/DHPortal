@@ -1,6 +1,6 @@
 var functionArray = [        
         {"name" : "Abs", "hint" : "Returns the absolute value of same type for Numbers / returns the Modulus for Complex", "func_name" : "abs(x)"},
-        {"name" : "Aggregate Function", "hint" : "Execute an aggregation function", "func_name" : "aggregation('function','attribute parameters')"},
+        {"name" : "Aggregate Function", "hint" : "Execute an aggregation function", "func_name" : "aggregation(function,attribute parameters)"},
         {"name" : "Append", "hint" : "Appends second parameter to first paramenter as string", "func_name" : "append(str1, str2)"},
         {"name" : "Arc Cosine", "hint" : "Inverse Cosine", "func_name" : "acos(x)"},
         {"name" : "Arc Cosine Hyperbolic", "hint" : "Inverse Hyperbolic Cosine", "func_name" : "acosh(x)"},

@@ -10,7 +10,7 @@
 	height: 95%;
 	margin-left: 16%;
 	float: left;
-	text-align: vertical;
+	/*text-align: vertical;*/
 }
 
 #right-side{
@@ -19,7 +19,7 @@
 	width: 54%;
 	height: 98%;
 	right: 1%;
-	text-align: vertical;
+	/*text-align: vertical;*/
 }
 
 #groups{
