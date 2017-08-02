@@ -1,5 +1,4 @@
-var 3,var A,abs(cast(-8 as float))+15/3-acos(cast(10 as float))
-var 0,var V,aggregation('sum'#COMMA_CHAR#'|=v1|=v2')
-var 056,var R,atan2(cast(10 as float)#COMMA_CHAR# cast(20 as float))-15
-var 6,var J,'test1_test2_test3'||var 6
+Old_attr,New_attr,Format,Missing Timestamp,Subject Ref.,Pseudonymization,Type,Unit,Range,Function
+"var 3","var 20","","","","","","","","abs(cast(_mipmap_function_  as float))-3"
+"var 0","var 19","","","","","","","","'hello'||_mipmap_function_ "
 

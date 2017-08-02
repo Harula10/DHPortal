@@ -20,10 +20,10 @@
 				$sql="INSERT INTO users(username,email,password) VALUES ('".$username."','".$email."','".$password."');";
 				$result = mysqli_query($conn,$sql);
 				//create user folders in server
-				mkdir("../users/".$username, 0777, true);
-				mkdir("../users/".$username."/public", 0777, true);
-				mkdir("../users/".$username."/private", 0777, true);
-				mkdir("../users/".$username."/temp", 0777, true);
+				mkdir("../../users/".$username, 0777, true);
+				mkdir("../../users/".$username."/public", 0777, true);
+				mkdir("../../users/".$username."/private", 0777, true);
+				mkdir("../../users/".$username."/temp", 0777, true);
 				
 				//start a session
 				$_SESSION['logged_user'] = "$username";
