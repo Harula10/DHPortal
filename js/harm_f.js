@@ -147,20 +147,19 @@ function chooseFile(path){
 
 
 function getFile(){
-	var files = document.getElementById(id).files;
+	var files = document.getElementById('inputfilecsv').files;
 	if (files.length <= 0) return;
 	var fr = new FileReader();
 	fr.onload = function() { 
 		rows = fr.result.split("\n");
 		readCSV();
-		
 	}
 	fr.readAsText(files.item(0));
 }
 
 function readCSV(){
 	for (var i = 1; i < rows.length-1; i++) {
-		var cells = rows[i].split(";");
+		var cells = rows[i].split(",");
 		if(cells[2].trim()!="Polynominal" && cells[2].trim()!="Binominal" && cells[2].trim()!="Real" ){
 			alert("Please, upload a valid CSV!");
 			return;
@@ -177,7 +176,7 @@ function readCSV(){
 	}
 	//variables to match are added-now set the options
 	load_options();	
-	load_functions()
+	load_functions();
 }
 
 function load_options(){

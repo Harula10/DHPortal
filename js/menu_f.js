@@ -177,7 +177,7 @@ function getFile(id){
 
 function readCSV(classname){
 	for (var i = 1; i < rows.length-1; i++) {
-		var cells = rows[i].split(";");
+		var cells = rows[i].split(",");
 		if(cells[2].trim()!="Polynominal" && cells[2].trim()!="Binominal" && cells[2].trim()!="Real" ){
 			alert("Please, upload a valid CSV!");
 			return;
