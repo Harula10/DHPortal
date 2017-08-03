@@ -3,8 +3,8 @@
 -- http://www.phpmyadmin.net
 --
 -- Φιλοξενητής: 127.0.0.1
--- Χρόνος δημιουργίας: 08 Μάη 2017 στις 15:09:22
--- Έκδοση διακομιστή: 10.1.13-MariaDB
+-- Χρόνος δημιουργίας: 03 Αυγ 2017 στις 20:30:20
+-- Έκδοση διακομιστή: 5.6.26-log
 -- Έκδοση PHP: 7.0.6
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
@@ -19,9 +19,6 @@ SET time_zone = "+00:00";
 --
 -- Βάση δεδομένων: `dh_users`
 --
-
-CREATE DATABASE IF NOT EXISTS `dh_users` DEFAULT CHARACTER SET latin1 COLLATE latin1_swedish_ci;
-USE `dh_users`;
 
 -- --------------------------------------------------------
 
@@ -45,7 +42,9 @@ INSERT INTO `friendships` (`from_user`, `to_user`) VALUES
 ('user1', 'user4'),
 ('user4', 'user1'),
 ('user3', 'user1'),
-('user1', 'user3');
+('user1', 'user3'),
+('user5', 'user2'),
+('user2', 'user5');
 
 -- --------------------------------------------------------
 
@@ -57,20 +56,19 @@ CREATE TABLE `users` (
   `username` varchar(15) NOT NULL,
   `email` varchar(50) NOT NULL,
   `password` varchar(50) NOT NULL,
-  `rights` int NOT NULL
+  `rights` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 --
 -- Άδειασμα δεδομένων του πίνακα `users`
--- rights: 0: users, 1: admin
+--
 
 INSERT INTO `users` (`username`, `email`, `password`, `rights`) VALUES
-('user1', 'user1@live.com', 'user1',0),
-('user2', 'user2@gmail.com', 'user2',1),
-('user3', 'user3@live.com', 'user3',0),
-('user4', 'user4@live.com', 'user4',0),
-('user5', 'user5@live.com', 'user5',0),
-('user6', 'user6@live.com', 'user6',1);
+('user1', 'user1@live.com', 'user1', 0),
+('user2', 'user2@gmail.com', 'user2', 1),
+('user3', 'user3@live.com', 'user3', 0),
+('user4', 'user4@live.com', 'user4', 0),
+('user5', 'user5@live.com', 'user5', 0);
 
 --
 -- Ευρετήρια για άχρηστους πίνακες
