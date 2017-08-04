@@ -63,41 +63,53 @@ function loadData(folder){
 }
 
 function shareData(folder){
-	var filename = prompt("Save as...");
-	var data = encodeURIComponent(CSVtobeTransformed().trim());
-	if (filename != null) {
-		var	xmlhttp = new XMLHttpRequest();
-		xmlhttp.onreadystatechange=function() {
-			if (xmlhttp.readyState==4){
-				var res = xmlhttp.responseText;
-				alert(res+"The file is saved with a .csv extension.");
+	if(checkQuotation()){
+		var filename = prompt("Save as...");
+		var data = encodeURIComponent(CSVtobeTransformed().trim());
+		if (filename != null) {
+			var	xmlhttp = new XMLHttpRequest();
+			xmlhttp.onreadystatechange=function() {
+				if (xmlhttp.readyState==4){
+					var res = xmlhttp.responseText;
+					alert(res+"The file is saved with a .csv extension.");
+				}
 			}
+			xmlhttp.open("POST","../php_files/data_handling/file_handler.php?action=sharecsv&path="+folder+"/"+filename+".csv"+"&data="+data,true);
+			xmlhttp.send();
 		}
-		xmlhttp.open("POST","../php_files/data_handling/file_handler.php?action=sharecsv&path="+folder+"/"+filename+".csv"+"&data="+data,true);
-		xmlhttp.send();
+	}else{
+		alert("The fields should include single quotation only.");
+		return;
 	}
 }
+
+function checkQuotation(){
+	var texts = document.querySelectorAll("textarea");
+	for(var i = 0; i<texts.length;i++){
+		if(texts[i].value.includes("\"")){
+			return false;
+		}	
+	}	
+	return true;
+}	
 
 var _func="";
 function CSVtobeTransformed(){
 	var table = document.querySelectorAll("#table");
 	var str = "Old_attr,New_attr,Format,Missing Timestamp,Subject Ref.,Pseudonymization,Type,Unit,Range,Function<br>";
-	var new_var,old_var,format,timestamp,ref,pseudo,type,unit,range,func;
+	
+	var new_var,old_var,others,func;
 	for (var i = 1, row; row = table[2].rows[i]; i++) {
-		old_var = table[2].rows[i].cells[1].firstChild.value;
-		new_var = table[2].rows[i].cells[0].innerHTML;
-		format = table[2].rows[i].cells[4].firstChild.value;
-		timestamp = table[2].rows[i].cells[5].firstChild.value;
-		ref = table[2].rows[i].cells[6].firstChild.value;
-		pseudo = table[2].rows[i].cells[7].firstChild.value;
-		type = table[2].rows[i].cells[8].firstChild.value;
-		unit = table[2].rows[i].cells[9].firstChild.value;
-		range = table[2].rows[i].cells[10].firstChild.value;
-		func = table[2].rows[i].cells[3].firstChild.value;
+		old_var = quotation(table[2].rows[i].cells[1].firstChild.value);
+		new_var = quotation(table[2].rows[i].cells[0].innerHTML);
+		others = "";
+		for (var j = 4; j < 11; j++) {
+			others = others + quotation(table[2].rows[i].cells[j].firstChild.value)+",";
+		}
+		func = quotation(table[2].rows[i].cells[3].firstChild.value);
 		if(old_var!="none"){
 			transform(func.trim());
-			str = str + quotation(old_var) +","+ quotation(new_var) +","+ quotation(format) +","+ quotation(timestamp) +","+ quotation(ref) +","
-					+ quotation(pseudo) +","+ quotation(type) +","+ quotation(unit) +","+ quotation(range) + quotation(_func) + "<br>";
+			str = str + old_var +","+ new_var +"," + others + _func + "<br>";
 		}
 	}
 	return str;
