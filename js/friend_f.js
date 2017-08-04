@@ -1,3 +1,5 @@
+windows
+
 function search(){
 	var search = document.querySelector("input[name=search]");
 	var	xmlhttp = new XMLHttpRequest();

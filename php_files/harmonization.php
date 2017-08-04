@@ -66,6 +66,7 @@
 				<svg></svg>
 			</div>
 			<div id="group-info">
+				<h4>Group Details:</h4>
 				<table id="table">
 					<tr id="title">
 					<th>Code</th>
@@ -79,7 +80,8 @@
 					</tr>
 				</table>
 			</div>
-			<div id="var-info">
+			<div id="var-info"><br>
+				<h4>Variable Details:</h4>
 				<table id="table">
 					<tr id="title">
 						<th>Code</th>

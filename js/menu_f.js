@@ -168,7 +168,7 @@ function getFile(id){
 		}else{
 			//split each row of csv file
 			rows = fr.result.split("\n");
-			readCSV("new");
+			readCSV("ungrouped new");
 		}
 		
 	}

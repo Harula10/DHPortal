@@ -20,6 +20,7 @@ function saveV(){
 	if(checkrequired("vars requiredField")){ //if the required fields are not filled
 		return;
 	}
+	var classname = false;
 	if(flagV){
 		if(editV()){ //deletes the old variable from table
 			//deletes the variable from localStorage
@@ -31,11 +32,12 @@ function saveV(){
 				}
 			}
 			localStorage.variables = JSON.stringify(vars);
-			//delete the old var from group
-			if(highlighted.group.trim()==""){
+			if(highlighted.group.trim()!=""){
+				alert("Add the variable in a new group!");
 				var e = document.querySelector("#select2");
 				highlighted.group = e.options[e.selectedIndex].text;
 			}
+			//delete the old var from group
 			if(highlighted.group=="None"){
 				for(var i = 0; i<JSONobj.length; i++){
 					if(JSONobj[i].code == highlighted.code ){
@@ -55,6 +57,7 @@ function saveV(){
 					}
 				}
 			}
+			classname = true;
 		}else{
 			return;
 		}
@@ -65,7 +68,6 @@ function saveV(){
 		document.getElementById("data").style.visibility = "hidden";
 		var table = document.querySelector("#table");	
 		var tr = document.createElement("tr");
-		tr.setAttribute("class", "new"); 
 		
 		for(var i = 0; i < 4; i++){
 			var td = document.createElement("td");
@@ -81,16 +83,23 @@ function saveV(){
 				"description" : new_vars[4].value,
 				"methodology" : new_vars[5].value
 			};
-		group = search(JSONobj,new_vars[3].value,false);
-		if(group){
-			if(JSON.stringify(group.children[0], null, ' ')=="{}")
-				group.children.splice(0, 1);
-			group.children.push(variable);
+		if(new_vars[3].value.trim()==""){
+			variable["classname"] = "new ungrouped";
+			tr.setAttribute("class", "new ungrouped"); 
 		}else{
-			JSONobj.push(variable);
+			group = search(JSONobj,new_vars[3].value,false);
+			if(group){
+				if(JSON.stringify(group.children[0], null, ' ')=="{}")
+					group.children.splice(0, 1);
+				group.children.push(variable);
+			}else{
+				JSONobj.push(variable);
+			}
+			localStorage.JSONobj = JSON.stringify(JSONobj);
+			draw();
+			variable["classname"] = "new grouped";
+			tr.setAttribute("class", "new grouped"); 
 		}
-		localStorage.JSONobj = JSON.stringify(JSONobj);
-		draw();
 		var td = document.createElement("td");
 		td.innerHTML = new_vars[5].value;
 		tr.appendChild(td);
@@ -99,8 +108,7 @@ function saveV(){
 		tr.appendChild(td);
 		tr.addEventListener("click",fillformV);
 		table.appendChild(tr);
-		
-		variable["classname"] = "new";
+	
 		var vars = JSON.parse(localStorage.variables);
 		vars.push(variable);
 		localStorage.variables = JSON.stringify(vars);
@@ -279,12 +287,7 @@ function select_tab(e){
 	}
 	if(e.target.innerHTML=="Ungrouped"){
 		hideTR("grouped");
-		hideTR("new");
 	}else if(e.target.innerHTML=="Grouped"){
-		hideTR("ungrouped");
-		hideTR("new");
-	}else if(e.target.innerHTML=="Recent"){
-		hideTR("grouped");
 		hideTR("ungrouped");
 	}
 }

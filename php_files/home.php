@@ -72,7 +72,6 @@
 						<li id="selected"><a>All Variables</a></li>
 						<li><a>Grouped</a></li>
 						<li><a>Ungrouped</a></li>
-						<li><a>Recent</a></li>
 					</ul>
 				</nav>
 				<table id="table">

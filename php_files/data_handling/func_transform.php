@@ -1,6 +1,6 @@
 <?php	
-	$function = $_GET['func'];
-	$pattern = '/(?<=[\)\d])[\+\-\/*]/';
+	$function = preg_replace('/\s+/', '', $_GET['func']);
+	$pattern = '/(?<=[\)\d]|[\']|\w)[\+\-\/*]/';
 	//Get operators
 	$operators = null;
 	preg_match_all($pattern, $function, $operators,PREG_SET_ORDER, 0);
@@ -14,7 +14,15 @@
 				$csv = $csv . $operators[$j][0];
 				$j++;
 			}
-			$csv = $csv . splitExpression($del[$i]);
+			if(strpos($del[$i], "(") === false){ //if the parameter is not a function then:
+				if (strpos($del[$i], "'") === false && $del[$i]!='true' && $del[$i]!='false') { //if the parameter is not a string or a boolean
+					$csv = $csv . "_mipmap_function_ "; //placeholder
+				}else{
+					$csv = $csv . $del[$i];
+				}
+			}else{ //else split the function
+				$csv = $csv . splitExpression($del[$i]);
+			}
 		}else{
 			if($csv!="" && $operators){
 				$csv = $csv . $operators[$j][0];
@@ -25,15 +33,35 @@
 	}
 	echo $csv;
 	
-	function splitExpression($function){
-		$functions = preg_split('/[\(,\)]/', $function);
-		$functionName = $functions[0];
-		
-		$params = [];
-		for($i = 1; $i < count($functions); $i++){
-			$params[] = trim($functions[$i]);
+	
+function splitExpression($function){
+	//$function: if(x==0,'YES',value)
+	$parameters = preg_split('/(?=.+)(\(|,|==|>|<|<=|>=|!=|\))/', $function);
+	//$parameters: [if,x,0,'YES',value]
+	$functionName = $parameters[0];
+	$replaced_params = replaceVars($parameters);
+	//$replaced_params: [if,_mipmap_function_,0,'YES',_mipmap_function_]
+	for($i = 1; $i < count($parameters); $i++){
+		$function = str_replace($parameters[$i],$replaced_params[$i],$function);
+	}
+  
+	//$function: if(_mipmap_function_==0,'YES',_mipmap_function_)
+	$array = preg_split('/[(,)]/', $function);
+	//array: [if,_mipmap_function_==0,'YES',_mipmap_function_]
+	return replaceFunctionText($functionName,$array);
+  
+	}
+
+	function replaceVars($parameters){
+		//Whenever parameters are non strings, replace the parameter with the placeholder
+		for($i = 1; $i < count($parameters); $i++){
+			if (strpos($parameters[$i], "'") === false) { //if the parameter is not a string
+				if (!is_numeric($parameters[$i]) && $parameters[$i]!='true' && $parameters[$i]!='false') { 
+					$parameters[$i] = "_mipmap_function_ "; //placeholder
+				}
+			}
 		}		
-		return replaceFunctionText($functionName,$params);
+		return $parameters;
 	}
 	
 	function replaceFunctionText($functionName, array $parameters){
@@ -41,55 +69,47 @@
 		$POSTGRES_DATE_FUNCTION = "current_date";
 		$POSTGRES_CURRENT_YEAR_FUNCTION = "extract(year from current_date)";
 		$output = "";
-		if($functionName!="aggregation"){
-			//Whenever parameters are non strings, replace the parameter with the placeholder
-			for($i = 0; $i < count($parameters); $i++){
-				if (strpos($parameters[$i], "'") === false) { //if the parameter is not a string
-					$parameters[$i] = "_mipmap_function_ "; //placeholder
-				}
-			}
-		}
 		
 		switch ($functionName) {
 			case "abs":
-				$output = "abs(cast(" .$parameters[0]. " as float))";
+				$output = "abs(cast(" .$parameters[1]. " as float))";
 				break;
 			case "aggregation":
 				//adds | to all logical operators
 				$op = "|"; 
 				$parameters[1] = preg_replace_callback( '/(==|!=|<|>|<=|>=)/', 
-					function($match) use ($op) { return (($op.$match[0])); }, $parameters[1]); 
-				$output = "aggregation(".$parameters[0].",".$parameters[1].")";
+					function($match) use ($op) { return (($op.$match[1])); }, $parameters[2]); 
+				$output = "aggregation(".$parameters[1].",".$parameters[2].")";
 				break;
 			case "append":
-				$output = $parameters[0] ."||". $parameters[1];
+				$output = $parameters[1] ."||". $parameters[2];
 				break;
 			case "acos":
-				$output = "acos(cast(" .$parameters[0]. " as float))";
+				$output = "acos(cast(" .$parameters[1]. " as float))";
 				break;
 			case "asin":
-				$output = "asin(cast(" .$parameters[0]. " as float))";
+				$output = "asin(cast(" .$parameters[1]. " as float))";
 				break;
 			case "atan":
-				$output = "atan(cast(" .$parameters[0]. " as float))";
+				$output = "atan(cast(" .$parameters[1]. " as float))";
 				break;
 			case "atan2":
-				$output = "atan2(cast(" .$parameters[0]. " as float), cast(" .$parameters[1]. " as float))";
+				$output = "atan2(cast(" .$parameters[1]. " as float), cast(" .$parameters[2]. " as float))";
 				break;
 			case "ceil":
-				$output = "ceil(cast(" .$parameters[0]. " as float))";
+				$output = "ceil(cast(" .$parameters[1]. " as float))";
 				break;
 			case "contains":
-				$output = $parameters[0] ." like '%". str_replace("\'","",$parameters[1]). "%'";
+				$output = $parameters[1] ." like '%". str_replace("\'","",$parameters[2]). "%'";
 				break;
 			case "containCount":
-				$output = "(length(" .$parameters[0]. ")-length(regexp_replace(" .$parameters[0].",".$parameters[1]."," ."''". "," ."'g'))) / length(" .$parameters[1]. ")";
+				$output = "(length(" .$parameters[1]. ")-length(regexp_replace(" .$parameters[1].",".$parameters[2]."," ."''". "," ."'g'))) / length(" .$parameters[2]. ")";
 				break; 
 			case "cos":
-				$output = "cos(cast(" .$parameters[0]. " as float))";
+				$output = "cos(cast(" .$parameters[1]. " as float))";
 				break;
 			case "cosh":
-				$output = "(exp(cast(" .$parameters[0]. " as float))+exp(-cast(" .$parameters[0]. " as float)))/2";
+				$output = "(exp(cast(" .$parameters[1]. " as float))+exp(-cast(" .$parameters[2]. " as float)))/2";
 				break;
 			case "currentYear":
 				$output = $POSTGRES_CURRENT_YEAR_FUNCTION;
@@ -101,98 +121,98 @@
 				$output = "date_trunc('second',localtimestamp)";
 				break;
 			case "exp":
-				$output = "exp(cast(" .$parameters[0]. " as float))";
+				$output = "exp(cast(" .$parameters[1]. " as float))";
 				break;
 			case "floor":
-				$output = "floor(cast(" .$parameters[0]. " as float))";
+				$output = "floor(cast(" .$parameters[1]. " as float))";
 				break;
 			case "if":
-				if(strpos($parameters[0], '==')!== false){
-					$parameters[0] = str_replace("==","=",$parameters[0]);
+				if(strpos($parameters[1], '==')!== false){
+					$parameters[1] = str_replace("==","=",$parameters[1]);
 				}
-				$output = "case when " .$parameters[0]. " then " .$parameters[1]. " else " .$parameters[2]. " end";                
+				$output = "case when " .$parameters[1]. " then " .$parameters[2]. " else " .$parameters[3]. " end";                
 				break;
 			case "indexof":
-				$output = "position(" .$parameters[1]. " in " .$parameters[0]. ")";
+				$output = "position(" .$parameters[2]. " in " .$parameters[1]. ")";
 				break;
 			case "isNull":
-				$output = "".$parameters[0] ." is null";
+				$output = "".$parameters[1] ." is null";
 				break;
 			case "isNotNull":
-				$output = "".$parameters[0] ." is not null";
+				$output = "".$parameters[1] ." is not null";
 				break;
 			case "len":
-				$output = "length(" .$parameters[0]. ")";
+				$output = "length(" .$parameters[1]. ")";
 				break;
 			case "log":
-				$output = "log(cast(" .$parameters[0]. " as float))";
+				$output = "log(cast(" .$parameters[1]. " as float))";
 				break;
 			case "ln":
-				$output = "ln(cast(" .$parameters[0]. " as float))";
+				$output = "ln(cast(" .$parameters[1]. " as float))";
 				break;
 			case "mod":
-				$output = "mod(round(cast(" .$parameters[0]. " as numeric)), round(cast(" .$parameters[1]. " as numeric)))";
+				$output = "mod(round(cast(" .$parameters[1]. " as numeric)), round(cast(" .$parameters[2]. " as numeric)))";
 				break;
 			case "null":
 				$output = "null";
 				break;
 			case "pow":
-				$output = "power(cast(" .$parameters[0]. " as float), cast(" .$parameters[1]. " as float))";
+				$output = "power(cast(" .$parameters[1]. " as float), cast(" .$parameters[2]. " as float))";
 				break;
 			case "replace":
-				$output = "replace(". $parameters[0] .",". " " .$parameters[1].", ".$parameters[2]. ")";
+				$output = "replace(". $parameters[1] .",". " " .$parameters[2].", ".$parameters[3]. ")";
 				break;                    
 			case "round":
 				//optional second parameter
 				if ($parameters.length==2){
-					$output = "round(cast(" .$parameters[0]. " as numeric),cast(cast(" .$parameters[1]. " as numeric) as integer))";
+					$output = "round(cast(" .$parameters[1]. " as numeric),cast(cast(" .$parameters[2]. " as numeric) as integer))";
 				}else{
-					$output = "round(cast(" .$parameters[0]. " as float))";
+					$output = "round(cast(" .$parameters[1]. " as float))";
 				}
 				break;
 			case "sin":
-				$output = "sin(cast(" .$parameters[0]. " as float))";
+				$output = "sin(cast(" .$parameters[1]. " as float))";
 				break;
 			case "sinh":
-				$output = "(exp(cast(" .$parameters[0]. " as float))-exp(-cast(" .$parameters[0]. " as float)))/2";
+				$output = "(exp(cast(" .$parameters[1]. " as float))-exp(-cast(" .$parameters[1]. " as float)))/2";
 				break;
 			case "sqrt":
-				$output = "sqrt(cast(" .$parameters[0]. " as float))";
+				$output = "sqrt(cast(" .$parameters[1]. " as float))";
 				break;
 			case "substring":
 				//optional third parameter
 				if (count($parameters)==3){
-				   $output = "substring(" .$parameters[0]. " from " .$parameters[1]. "+1 for " .$parameters[2]. "-" .$parameters[1]. ")"; 
+				   $output = "substring(" .$parameters[1]. " from " .$parameters[2]. "+1 for " .$parameters[3]. "-" .$parameters[2]. ")"; 
 				}else{
-					$output = "substring(" .$parameters[0]. " from " .$parameters[1]. "+ 1)"; 
+					$output = "substring(" .$parameters[1]. " from " .$parameters[2]. "+ 1)"; 
 				}
 				break;
 			case "tan":
-				$output = "tan(cast(" .$parameters[0]. " as float))";
+				$output = "tan(cast(" .$parameters[1]. " as float))";
 				break;
 			case "tanh":
-				$output = "(exp(cast(" .$parameters[0]. " as float))-exp(-cast(" .$parameters[0]. " as float)))/(exp(cast(" .$parameters[0]. " as float))+exp(-cast(" .$parameters[0]. " as float)))";
+				$output = "(exp(cast(" .$parameters[1]. " as float))-exp(-cast(" .$parameters[1]. " as float)))/(exp(cast(" .$parameters[1]. " as float))+exp(-cast(" .$parameters[1]. " as float)))";
 				break;
 			case "todate":
-				$output = "to_date(" .$parameters[0]. "," .$parameters[1]. ")";
+				$output = "to_date(" .$parameters[1]. "," .$parameters[2]. ")";
 				break;
 			case "todouble":
-				$output = "cast(" .$parameters[0]. " as float)";
+				$output = "cast(" .$parameters[1]. " as float)";
 				break;
 			case "toint":
-				$output = "round(cast(" .$parameters[0]. " as numeric))";
+				$output = "round(cast(" .$parameters[1]. " as numeric))";
 				break;
 			case "tolower":
-				$output = "lower(" .$parameters[0]. ")";
+				$output = "lower(" .$parameters[1]. ")";
 				break;
 			case "tostring":
-				$output = "cast(" .$parameters[0]. " as text)";
+				$output = "cast(" .$parameters[1]. " as text)";
 				break;
 			case "toupper":
-				$output = "upper(" .$parameters[0]. ")";
+				$output = "upper(" .$parameters[1]. ")";
 				break;
 			case "isNumeric":
-				$output = "".$parameters[0]. " ~ \'^[-]?[0-9]*\\.?[0-9]+([eE][-+]?[0-9]+)?$\'"; 
+				$output = "".$parameters[1]. " ~ \'^[-]?[0-9]*\\.?[0-9]+([eE][-+]?[0-9]+)?$\'"; 
 				break;
 			default:
 				break;

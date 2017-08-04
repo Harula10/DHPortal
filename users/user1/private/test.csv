@@ -1,0 +1,3 @@
+Old_attr,New_attr,Format,Missing Timestamp,Subject Ref.,Pseudonymization,Type,Unit,Range,Function
+"var 3","var A",,,,,,,"case when _mipmap_function_ =13 then  'YES' else _mipmap_function_  end"
+

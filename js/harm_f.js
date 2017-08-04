@@ -84,30 +84,32 @@ function CSVtobeTransformed(){
 	var str = "Old_attr,New_attr,Format,Missing Timestamp,Subject Ref.,Pseudonymization,Type,Unit,Range,Function<br>";
 	var new_var,old_var,format,timestamp,ref,pseudo,type,unit,range,func;
 	for (var i = 1, row; row = table[2].rows[i]; i++) {
-		old_var = "\""+table[2].rows[i].cells[1].firstChild.value+"\"";
-		new_var = "\""+table[2].rows[i].cells[0].innerHTML+"\"";
-		format = "\""+table[2].rows[i].cells[4].firstChild.value+"\"";
-		timestamp = "\""+table[2].rows[i].cells[5].firstChild.value+"\"";
-		ref = "\""+table[2].rows[i].cells[6].firstChild.value+"\"";
-		pseudo = "\""+table[2].rows[i].cells[7].firstChild.value+"\"";
-		type = "\""+table[2].rows[i].cells[8].firstChild.value+"\"";
-		unit = "\""+table[2].rows[i].cells[9].firstChild.value+"\"";
-		range = "\""+table[2].rows[i].cells[10].firstChild.value+"\"";
+		old_var = table[2].rows[i].cells[1].firstChild.value;
+		new_var = table[2].rows[i].cells[0].innerHTML;
+		format = table[2].rows[i].cells[4].firstChild.value;
+		timestamp = table[2].rows[i].cells[5].firstChild.value;
+		ref = table[2].rows[i].cells[6].firstChild.value;
+		pseudo = table[2].rows[i].cells[7].firstChild.value;
+		type = table[2].rows[i].cells[8].firstChild.value;
+		unit = table[2].rows[i].cells[9].firstChild.value;
+		range = table[2].rows[i].cells[10].firstChild.value;
 		func = table[2].rows[i].cells[3].firstChild.value;
-		if(old_var!="\"none\""){
-			if(type=="\"none\"") type = "\"\"";
-			str = str + old_var +","+ new_var +","+ format +","+ timestamp +","+ ref +","+ pseudo +","+ type 
-						+","+ unit +","+ range;
-			//Transform function
+		if(old_var!="none"){
 			transform(func.trim());
-			if(_func!=""){
-				str = str +","+"\""+_func+"\"<br>";
-			}else{
-				str = str + "<br>";
-			}
+			str = str + quotation(old_var) +","+ quotation(new_var) +","+ quotation(format) +","+ quotation(timestamp) +","+ quotation(ref) +","
+					+ quotation(pseudo) +","+ quotation(type) +","+ quotation(unit) +","+ quotation(range) + quotation(_func) + "<br>";
 		}
 	}
 	return str;
+}
+
+function quotation(_field){
+	//if the field is NA then leave it empty
+	if(_field.trim()==""||_field=="none"){
+		return "";
+	}else{ //else put quotation ""
+		return "\""+_field+"\"";
+	}
 }
 
 function transform(_function){
