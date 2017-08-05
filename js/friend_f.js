@@ -1,4 +1,3 @@
-windows
 
 function search(){
 	var search = document.querySelector("input[name=search]");
@@ -11,7 +10,7 @@ function search(){
 					request(search.value);
 				}
 			}else{
-				alert("Insert a valid username or e-mail!");
+				alert("The user with that username or e-mail does not exist.");
 			}
 			
 		}
@@ -27,7 +26,9 @@ function request(search){
 			var res = xmlhttp.responseText;
 			if(res!="no"){
 				alert("A request has been sent!");
+				location.reload();
 			}else{
+				alert("You have already sent a request to that user.");
 				location.reload();
 			}
 		}
@@ -47,6 +48,21 @@ function friendsfiles(friend){
 	}
 	xmlhttp.open("GET","../php_files/data_handling/file_handler.php?action=loadfriendfile&path="+friend+"/public"+"&data=null",false);
 	xmlhttp.send();
+}
+
+function unfriend(friend){
+	if(confirm("Are you sure you want to remove user '"+friend+"' from your community?")){
+		var	xmlhttp = new XMLHttpRequest();
+		xmlhttp.onreadystatechange=function() {
+			if (xmlhttp.readyState==4){
+				var res = xmlhttp.responseText;
+				alert(res);
+				location.reload();
+			}
+		}
+		xmlhttp.open("GET","../php_files/data_handling/requests_handler.php?action=unfriend&search="+friend,true);
+		xmlhttp.send();
+	}	
 }
 
 //it opens the file of friend's public folder

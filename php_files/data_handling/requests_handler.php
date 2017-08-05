@@ -16,6 +16,13 @@
 		}else{
 			echo "yes";
 		}
+	}else if($action=="unfriend"){
+		$query="DELETE FROM friendships WHERE from_user='".$_SESSION["logged_user"]."' AND to_user='".$name."';";
+		$result = mysqli_query($conn,$query);
+		//delete both friendship pairs
+		$query="DELETE FROM friendships WHERE to_user='".$_SESSION["logged_user"]."' AND from_user='".$name."';";
+		$result = mysqli_query($conn,$query);
+		echo "The friend has been removed from your community.";
 	}else{
 		$query="SELECT * FROM friendships WHERE from_user='".$_SESSION["logged_user"]."' AND to_user='".$name."';";
 		$result = $db->numofRows($query);

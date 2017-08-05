@@ -59,7 +59,7 @@
 						$query2 = "SELECT * FROM friendships WHERE from_user='".$row1['to_user']."' AND to_user='".$username."';";
 						$result2 = $conn->query($query2);
 						foreach($result2 as $row2) {
-							echo "<div onclick=\"friendsfiles('".$row2['from_user']."')\"><img src=\"../img/friend.ico\">".$row2['from_user']."</div>";
+							echo "<div><div onclick=\"friendsfiles('".$row2['from_user']."')\">".$row2['from_user']."<img src=\"../img/friend.ico\"></div><font color='red'><p id='unfriend' onclick=\"unfriend('".$row2['from_user']."')\">Unfriend</p></font></div>";
 						}
 					}
 					$db->closeConn();

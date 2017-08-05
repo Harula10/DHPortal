@@ -64,7 +64,6 @@ body{
 /*Friends Tab*/
 #friends div{
 	font-size: 20px;
-	border: 2px solid #ccc;
 	text-align: center;
 	display: inline-block;
 	margin-right: 1%;
@@ -73,20 +72,40 @@ body{
 	background-repeat: no-repeat;
     background-attachment: fixed;
     background-position: center; 
-	padding-top:1%;
-	height: 17%;
+	height: 20%;
 	width: 10%;
+}
+
+#unfriend:hover{
+	font-weight: bold;
+}
+
+#unfriend{
+	position: relative;
+	border: 1px solid #ccc;
+	margin: 0;
+	width: 100%;
+}
+
+#friends div div{
+	border: 2px solid #ccc;
+	display: block;
+	height: 75%;
+	width: 100%;
+	padding-bottom: 2%;
 }
 
 #friends div img, #folders div div img{
 	border: 2px solid #ccc;
 	margin: auto;
+	margin-top:2%;
+	margin-bottom:2%;
 	display: block;
-	height: 60%;
-	width: 60%;
+	height: 70%;
+	width: 65%;
 }
 
-#friends div:hover, #folders div div:hover{
+#friends div div:hover, #folders div div:hover{
 	border: 1px solid gray;
 }
 
