@@ -1,4 +1,3 @@
-Old_attr,New_attr,Format,Missing Timestamp,Subject Ref.,Pseudonymization,Type,Unit,Range,Function
-"var 0","var A",,,,,,,"case when _mipmap_function_ ='hell' then _mipmap_function_  else 'www' end+_mipmap_function_ +'haha'+true"
-"var 3","var V",,,,,,,"case when _mipmap_function_ ='hell' then _mipmap_function_  else 'www' end+_mipmap_function_ +_mipmap_function_ "
+Old_attr,New_attr,Format,Missing Timestamp,Subject Ref.,Pseudonymization,Type,Unit,Range,Function, Transformed_Function
+"var 3","var A",,,,,,,,"append('ha', str2)",'ha'||_mipmap_function_ 
 

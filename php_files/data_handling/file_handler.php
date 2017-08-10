@@ -17,11 +17,26 @@
 		fclose($file);
 		echo "Meta-data has been saved!";
 	}else if($action=="loadfriendfile"){
-		$path = "../users/".$folder; //$folder: 'friend_username/public'
+		include('database_handler.php');
+		$db = new Database();
+		$db->setConn();
+					
+		$query="SELECT * FROM users WHERE username='".$folder."';"; //checks if that user is an admin
+		$result=mysqli_query($conn,$query);
+		$obj=mysqli_fetch_object($result);
+		if($obj->rights==1){
+			$path = "../users/".$folder."/private"; //$folder: 'friend_username'
+			$files = scandir("../".$path); //$files: the array with friend filename folders
+			for ($i = 2; $i < count($files); $i++) {
+			echo "<div onclick=\"chooseFFile('".$path."/".$files[$i]."')\"><img src=\"../img/file.png\">".$files[$i]."</div>";
+			}
+		}
+		$path = "../users/".$folder."/public"; //$folder: 'friend_username'
 		$files = scandir("../".$path); //$files: the array with friend filename folders
 		for ($i = 2; $i < count($files); $i++) {
 			echo "<div onclick=\"chooseFFile('".$path."/".$files[$i]."')\"><img src=\"../img/file.png\">".$files[$i]."</div>";
 		}
+		$db->closeConn();
 	}else if($action=="sharecsv"){
 		$path = "../users/".$_SESSION["logged_user"]."/".$folder;
 		$file = fopen("../".$path,"w");

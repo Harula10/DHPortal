@@ -2,9 +2,10 @@ var to_match;
 window.onload = function(){	
 	initializeSVG(480);
 	var y = document.querySelectorAll(".navlink");
-	y[2].addEventListener("click",uploadCSV);
-	y[3].addEventListener("click",showload);
-	y[4].addEventListener("click",showshare);
+	y[3].addEventListener("click",downloadCSV);
+	y[4].addEventListener("click",uploadCSV);
+	y[5].addEventListener("click",showload);
+	y[6].addEventListener("click",showshare);
 	
 	if(localStorage.JSONobj){
 		JSONobj = JSON.parse(localStorage.JSONobj);
@@ -22,6 +23,25 @@ window.onload = function(){
 		}
 	}else{
 		to_match = [];
+	}
+	
+	if(localStorage.csv){
+		rows = localStorage.csv.split("\n");
+		to_match = [];
+		readCSV();
+		localStorage.removeItem("csv");
+	}
+}
+
+function downloadCSV(event){
+	if(checkQuotation()){
+		var filename = prompt("Save as...");
+		var data = "text/csv;charset=utf-8," + encodeURIComponent(CSVtobeTransformed().trim().replace(/<br>/g, "\n"));
+		event.target.href = 'data:' + data;
+		event.target.download = filename;
+	}else{
+		alert("The fields should include single quotation only.");
+		return;
 	}
 }
 
@@ -96,7 +116,7 @@ function checkQuotation(){
 var _func="";
 function CSVtobeTransformed(){
 	var table = document.querySelectorAll("#table");
-	var str = "Old_attr,New_attr,Format,Missing Timestamp,Subject Ref.,Pseudonymization,Type,Unit,Range,Function<br>";
+	var str = "Old_attr,New_attr,Format,Missing Timestamp,Subject Ref.,Pseudonymization,Type,Unit,Range,Function, Transformed_Function<br>";
 	
 	var new_var,old_var,others,func;
 	for (var i = 1, row; row = table[2].rows[i]; i++) {
@@ -106,10 +126,10 @@ function CSVtobeTransformed(){
 		for (var j = 4; j < 11; j++) {
 			others = others + quotation(table[2].rows[i].cells[j].firstChild.value)+",";
 		}
-		func = quotation(table[2].rows[i].cells[3].firstChild.value);
-		if(old_var!="none"){
+		if(old_var!=""){
+			func = table[2].rows[i].cells[3].firstChild.value;
 			transform(func.trim());
-			str = str + old_var +","+ new_var +"," + others + _func + "<br>";
+			str = str + old_var +","+ new_var +"," + others + quotation(func) + "," + quotation(_func) + "<br>";
 		}
 	}
 	return str;

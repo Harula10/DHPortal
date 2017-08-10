@@ -34,8 +34,9 @@
 				<li><a href="myfriends.php">My friends</a></li>
 				<li><a href="harmonization.php">Harmonize data</a></li>
 				<br><br><br>
-				<li class="disabled"><a class="navlink"><font color="gray">Upload meta-data(JSON)</font></a></li>
+				<li class="navlink" class="disabled"><a class="navlink"><font color="gray">Upload meta-data(JSON)</font></a></li>
 				<li class="disabled"><a class="navlink"><font color="gray">Download meta-data(JSON)</font></a></li>
+				<li><a class="navlink">Download variable-data(CSV)</a></li>
 				<li><input type="file" onchange="getFile()"  accept=".csv" id="inputfilecsv"/><a class="navlink">Upload Variables(CSV)</a></li>
 				<br><br>
 				<div class="dropdown">

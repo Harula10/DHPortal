@@ -1,5 +1,22 @@
+function show_requests(){
+	var	xmlhttp = new XMLHttpRequest();
+	xmlhttp.onreadystatechange=function() {
+		if (xmlhttp.readyState==4){
+			var res = xmlhttp.responseText;
+			if(res){
+				document.getElementById("files").innerHTML = res;
+				document.getElementById("folders").style.display="block";
+			}else{
+				alert("There are no requests.");
+				location.reload();
+			}
+		}
+	}
+	xmlhttp.open("GET","../php_files/data_handling/requests_handler.php?action=show&search=",true);
+	xmlhttp.send();
+}
 
-function search(){
+function search(flag){
 	var search = document.querySelector("input[name=search]");
 	var	xmlhttp = new XMLHttpRequest();
 	xmlhttp.onreadystatechange=function() {
@@ -7,7 +24,7 @@ function search(){
 			var res = xmlhttp.responseText;
 			if(res=="yes"){
 				if(confirm("Do you wish to add the user '"+search.value+"' to your friends?")){
-					request(search.value);
+					request(search.value,flag);
 				}
 			}else{
 				alert("The user with that username or e-mail does not exist.");
@@ -18,15 +35,21 @@ function search(){
 	xmlhttp.open("GET","../php_files/data_handling/requests_handler.php?action=search&search="+search.value,true);
 	xmlhttp.send();
 }
-	
-function request(search){
+
+//flag is true: the user sent/deleted a requests to/from another user 
+//flag is false: the user accepted/declined another user
+function request(search,flag){
 	var	xmlhttp = new XMLHttpRequest();
 	xmlhttp.onreadystatechange=function() {
 		if (xmlhttp.readyState==4){
 			var res = xmlhttp.responseText;
 			if(res!="no"){
-				alert("A request has been sent!");
-				location.reload();
+				if(flag){
+					alert("A request has been sent!");
+					location.reload();
+				}else{
+					show_requests();
+				}
 			}else{
 				alert("You have already sent a request to that user.");
 				location.reload();
@@ -38,26 +61,36 @@ function request(search){
 }
 
 function friendsfiles(friend){
-	document.getElementById("folders").style.display = "block";
 	var	xmlhttp = new XMLHttpRequest();
 	xmlhttp.onreadystatechange=function() {
 		if (xmlhttp.readyState==4){
 			var res = xmlhttp.responseText;
 			document.getElementById("files").innerHTML = res;
+			document.getElementById("folders").style.display = "block";
 		}
 	}
-	xmlhttp.open("GET","../php_files/data_handling/file_handler.php?action=loadfriendfile&path="+friend+"/public"+"&data=null",false);
+	xmlhttp.open("GET","../php_files/data_handling/file_handler.php?action=loadfriendfile&path="+friend+"&data=null",false);
 	xmlhttp.send();
 }
 
-function unfriend(friend){
-	if(confirm("Are you sure you want to remove user '"+friend+"' from your community?")){
+function unfriend(friend,flag){
+	var conf;
+	if(flag){
+		conf = confirm("Are you sure you want to remove user '"+friend+"' from your community?");
+	}else{
+		conf = true;
+	}
+	if(conf){
 		var	xmlhttp = new XMLHttpRequest();
 		xmlhttp.onreadystatechange=function() {
 			if (xmlhttp.readyState==4){
 				var res = xmlhttp.responseText;
-				alert(res);
-				location.reload();
+				if(flag){
+					alert(res);
+					location.reload();
+				}else{
+					show_requests();
+				}
 			}
 		}
 		xmlhttp.open("GET","../php_files/data_handling/requests_handler.php?action=unfriend&search="+friend,true);
@@ -79,9 +112,13 @@ function chooseFFile(path){ //../users/user2/public/meta-dataaaa.json
 				localStorage.load_fromFriend = true;
 				window.location.href = "home.php";
 			}else if(path.includes(".csv")){
-				//split each row of csv file
 				localStorage.csv = allText;
-				window.location.href = "home.php";
+				if(confirm("Add these data to Harmonization Page?")){
+					//split each row of csv file
+					window.location.href = "harmonization.php";
+				}else{
+					window.location.href = "home.php";
+				}
 			}else{
 				alert("Wrong type!");
 				return;

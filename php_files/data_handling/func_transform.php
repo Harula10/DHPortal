@@ -1,5 +1,6 @@
 <?php	
-	$function = preg_replace('/\s+/', '', $_GET['func']);
+	$f = $_GET['func'];
+	$function = preg_replace('/\s+/', '', $f);
 	$pattern = '/(?<=[\)\d]|[\']|\w)[\+\-\/*]/';
 	//Get operators
 	$operators = null;

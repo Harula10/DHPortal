@@ -56,7 +56,7 @@ CREATE TABLE `users` (
   `username` varchar(15) NOT NULL,
   `email` varchar(50) NOT NULL,
   `password` varchar(50) NOT NULL,
-  `rights` int(11) NOT NULL
+  `rights` int(11) NOT NULL DEFAULT 0
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 --

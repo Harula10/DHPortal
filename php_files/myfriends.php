@@ -28,6 +28,7 @@
 				<br><br><br>
 				<li class="disabled"><a class="navlink"><font color="gray">Upload meta-data(JSON)</font></a></li>
 				<li class="disabled"><a class="navlink"><font color="gray">Download meta-data(JSON)</font></a></li>
+				<li class="disabled"><a class="navlink"><font color="gray">Download variable-data(CSV)</font></a></li>
 				<li class="disabled"><a class="navlink"><font color="gray">Upload Variables(CSV)</font></a></li>
 				<br><br>
 				<li class="disabled"><a class="navlink"><font color="gray">Load meta-data</font></a></li>
@@ -42,9 +43,10 @@
 			</div>
 		</div>
 		<div id="body">
+			<button id="requests" type="button" onclick="show_requests()">Friend Requests</button>
+			<button id="search" type="button" onclick="search(true)">Go</button>
 			<input type="text" name="search" placeholder="Search..">
-			<button id="search" type="button" onclick="search()">Go</button>
-			<br><br><br><br>
+			<br><br>
 			<fieldset id="friends">
 				<legend id="legend">My Community</legend>
 				<?php
@@ -59,7 +61,7 @@
 						$query2 = "SELECT * FROM friendships WHERE from_user='".$row1['to_user']."' AND to_user='".$username."';";
 						$result2 = $conn->query($query2);
 						foreach($result2 as $row2) {
-							echo "<div><div onclick=\"friendsfiles('".$row2['from_user']."')\">".$row2['from_user']."<img src=\"../img/friend.ico\"></div><font color='red'><p id='unfriend' onclick=\"unfriend('".$row2['from_user']."')\">Unfriend</p></font></div>";
+							echo "<div><div onclick=\"friendsfiles('".$row2['from_user']."')\">".$row2['from_user']."<img src=\"../img/friend.ico\"></div><p id='unfriend' onclick=\"unfriend('".$row2['from_user']."',true)\">Unfriend</p></div>";
 						}
 					}
 					$db->closeConn();

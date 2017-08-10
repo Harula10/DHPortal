@@ -19,9 +19,10 @@ window.onload = function(){
 	var y = document.querySelectorAll(".navlink");
 	y[0].addEventListener("click",uploadJSON);
 	y[1].addEventListener("click",downloadJSON);
-	y[2].addEventListener("click",uploadCSV);
-	y[3].addEventListener("click",showload);
-	y[4].addEventListener("click",showshare);
+	y[2].addEventListener("click",downloadCSV);
+	y[3].addEventListener("click",uploadCSV);
+	y[4].addEventListener("click",showload);
+	y[5].addEventListener("click",showshare);
 	
 	//LOCAL DATA
 	if(localStorage.variables){
@@ -51,6 +52,26 @@ window.onload = function(){
 		readCSV("ungrouped friends");
 		localStorage.removeItem("csv");
 	}
+}
+
+function downloadCSV(event){
+	var vars = JSON.parse(localStorage.variables);
+	var str = '';
+	for (var i = 0; i < vars.length; i++) {
+		var line = '';
+		for (var index in vars[i]) {
+			if(index=="group" || index=="classname"){
+				continue;
+			}else{
+				if (line != '') line += ','
+				line += vars[i][index];
+			}
+		}
+		str += line + '\r\n';
+	}
+	var data = "text/csv;charset=utf-8," + encodeURIComponent(str);
+	event.target.href = 'data:' + data;
+	event.target.download = 'variable-data.csv';
 }
 
 function downloadJSON(event){

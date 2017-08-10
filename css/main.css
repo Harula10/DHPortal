@@ -76,15 +76,25 @@ body{
 	width: 10%;
 }
 
-#unfriend:hover{
+#unfriend:hover,#accept:hover{
 	font-weight: bold;
+	cursor: pointer;
 }
 
-#unfriend{
+#unfriend, #accept{
 	position: relative;
 	border: 1px solid #ccc;
 	margin: 0;
 	width: 100%;
+}
+
+#accept{
+	color: green;
+	margin-top: 10%;
+}
+
+#unfriend{
+	color: red;
 }
 
 #friends div div{
@@ -117,16 +127,21 @@ body{
 }	
 
 input[name=search] {
-    width: 90%;
+    width: 60%;
     border: 2px solid #ccc;
     border-radius: 4px;
     font-size: 16px;
-	float: left;
+	float: right;
     padding: 12px 20px 12px 40px;
 }
 
-#search{
+#search,#requests{
 	padding: 0.9%;
+}
+
+#search{
+	float: right;
+	margin-right: 2%;
 	margin-left: 1%;
 }
 
