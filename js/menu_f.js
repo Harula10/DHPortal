@@ -56,7 +56,7 @@ window.onload = function(){
 
 function downloadCSV(event){
 	var vars = JSON.parse(localStorage.variables);
-	var str = '';
+	var str = 'Code,Label,Type,Description,Methodology\n';
 	for (var i = 0; i < vars.length; i++) {
 		var line = '';
 		for (var index in vars[i]) {

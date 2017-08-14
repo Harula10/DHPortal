@@ -1,3 +1,0 @@
-Old_attr,New_attr,Format,Missing Timestamp,Subject Ref.,Pseudonymization,Type,Unit,Range,Function, Transformed_Function
-"var 3","var A",,,,,,,,"append('ha', str2)",'ha'||_mipmap_function_ 
-

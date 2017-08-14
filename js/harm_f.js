@@ -13,14 +13,18 @@ window.onload = function(){
 	}
 	
 	if(localStorage.to_match_var){
-		if(localStorage.variables){
+		//if(localStorage.variables){
 			to_match = JSON.parse(localStorage.to_match_var);
 			for (var i = 0; i < to_match.length; i++){
-				initVar(to_match[i]);	
+				if(to_match[i].methodology){
+					initVar(to_match[i],5);
+				}else{
+					initVar(to_match[i],11);	
+				}
 				load_options();	
 				load_functions();
 			}
-		}
+		//}
 	}else{
 		to_match = [];
 	}
@@ -192,21 +196,61 @@ function getFile(){
 }
 
 function readCSV(){
-	for (var i = 1; i < rows.length-1; i++) {
-		var cells = rows[i].split(",");
-		if(cells[2].trim()!="Polynominal" && cells[2].trim()!="Binominal" && cells[2].trim()!="Real" ){
-			alert("Please, upload a valid CSV!");
+	var cells;
+	var delim;
+	if(rows[0].indexOf('Methodology') !== -1){ //if it has a methodology field then it is a var csv
+		delim = /,/g;
+	}else{ //else it is a harmonized one
+		if(rows[0].indexOf(';') !== -1){
+			delim = /;(?="|,)/g;
+		}else if(rows[0].indexOf(',') !== -1){
+			delim = /,(?="|,)/g;
+		}else{
+			alert("The valid delimiters of the csv are ; or ,");
 			return;
-		}					
-		var variable = {
-			"code" : cells[0],
-			"label" : cells[1],
-			"type" : cells[2].trim(),
-			"group" : "",
-			"description" : cells[3],
-			"methodology" : cells[4],
-		};
-		var_push(variable);
+		}
+	}
+	for (var i = 1; i < rows.length-1; i++) {
+		cells = rows[i].split(delim);
+		if(cells.length==5){
+			if(cells[2].trim()!="Polynominal" && cells[2].trim()!="Binominal" && cells[2].trim()!="Real" && cells[2].trim()!="Integer"){
+				alert("Please, upload a valid CSV!");
+				return;
+			}
+			var variable = {
+				"code" : cells[0],
+				"label" : cells[1],
+				"type" : cells[2].trim(),
+				"group" : "",
+				"description" : cells[3],
+				"methodology" : cells[4]
+			};
+			var_push(variable,5);
+		}else if(cells.length==11){
+			//add the code of the old var to the local storage so as to be added to options
+			if(!localStorage.to_match_var){
+				to_match = [];
+			}
+			//set the cells accordingly of each row
+			var variable = {
+				"old" : cells[0].replace(/"/g, ""), //old var
+				"code": cells[1].replace(/"/g, ""), //new var
+				"format" : cells[2].replace(/"/g, ""), //format
+				"timestamp" : cells[3].replace(/"/g, ""), //timestamp
+				"subjectref" : cells[4].replace(/"/g, ""), //subjectref
+				"pseudo" : cells[5].replace(/"/g, ""), //pseudonymization
+				"type" : cells[6].replace(/"/g, ""), //type
+				"unit" : cells[7].replace(/"/g, ""), //unit
+				"range" : cells[8].replace(/"/g, ""), //range	
+				"_function" : cells[9].replace(/"/g, "") //function	
+			};
+			var_push(variable,11);
+		}else{
+			if(cells.length!=1){
+				alert("The number of columns is invalid!");
+				return;
+			}
+		}
 	}
 	//variables to match are added-now set the options
 	load_options();	
@@ -222,6 +266,10 @@ function load_options(){
 			vars = JSON.parse(localStorage.variables);
 			for (var j = 0; j < vars.length; j++){
 				add_option(variable[i],vars[j].code);
+			}
+		}else{
+			for (var j = 0; j < to_match.length; j++){
+				add_option(variable[i],to_match[j].old);
 			}
 		}
 	}
@@ -251,7 +299,7 @@ function fillTextArea(){
 	}
 }
 
-function var_push(data){
+function var_push(data,cols){
 	var f = true;
 	for (var i = 0; i < to_match.length; i++) { //if a variable already exists
 		if (to_match[i].code == data.code) { //don't add it in array
@@ -261,11 +309,11 @@ function var_push(data){
 	if(f){ //if it doesn't exists add it in array AND table
 		to_match.push(data);
 		localStorage.to_match_var = JSON.stringify(to_match);
-		initVar(data);
+		initVar(data,cols);
 	}
 }
 
-function initVar(data){
+function initVar(data,cols){
 	document.getElementById("data").style.visibility = "hidden";
 	//New Variable
 	var table = document.querySelectorAll("#table");	
@@ -282,6 +330,13 @@ function initVar(data){
 	option.setAttribute("value","none");
 	option.innerHTML="Select none...";
 	select.appendChild(option);
+	if(cols==11){
+		var option = document.createElement("option");
+		option.setAttribute("value",data.old);
+		option.innerHTML = data.old;
+		select.appendChild(option);
+		select.value = data.old;
+	}
 	td.appendChild(select);
 	tr.appendChild(td);	
 	
@@ -299,16 +354,16 @@ function initVar(data){
 	tr.appendChild(td);	
 	
 	//Transformation
-	tr.appendChild(createTXTArea(data.code,"300px",40));
+	tr.appendChild(createTXTArea(cols,data._function,data.code,"300px",40));
 	
 	//Format
-	tr.appendChild(createTXTArea("","100px",20));
+	tr.appendChild(createTXTArea(cols,data.format,"","100px",20));
 	//Missing Timestamp
-	tr.appendChild(createTXTArea("","100px",20));
+	tr.appendChild(createTXTArea(cols,data.timestamp,"","100px",20));
 	//Subject Ref.
-	tr.appendChild(createTXTArea("","100px",20));
+	tr.appendChild(createTXTArea(cols,data.subjectref,"","100px",20));
 	//Pseudonymization
-	tr.appendChild(createTXTArea("","100px",20));
+	tr.appendChild(createTXTArea(cols,data.pseudo,"","100px",20));
 	//Type
 	td = document.createElement("td");
 	select = document.createElement("select");
@@ -318,28 +373,36 @@ function initVar(data){
 	option.innerHTML="Select none...";
 	select.appendChild(option);
 	option = document.createElement("option");
+	option.setAttribute("value","Polynominal");
 	option.innerHTML="Polynominal";
 	select.appendChild(option);
 	option = document.createElement("option");
+	option.setAttribute("value","Binominal");
 	option.innerHTML="Binominal";
 	select.appendChild(option);
 	option = document.createElement("option");
+	option.setAttribute("value","Real");
 	option.innerHTML="Real";
 	select.appendChild(option);
 	option = document.createElement("option");
+	option.setAttribute("value","Integer");
 	option.innerHTML="Integer";
 	select.appendChild(option);
+	if(cols==11){
+		if(data.type == "") data.type = "none";
+		select.value = data.type;
+	}
 	td.appendChild(select);
 	tr.appendChild(td);	
 	//Unit
-	tr.appendChild(createTXTArea("","100px",20));
+	tr.appendChild(createTXTArea(cols,data.unit,"","100px",20));
 	//Range
-	tr.appendChild(createTXTArea("","100px",20));
+	tr.appendChild(createTXTArea(cols,data.range,"","100px",20));
 	
 	table[2].appendChild(tr);
 }
 
-function createTXTArea(code,width,cols){
+function createTXTArea(cell,data,code,width,cols){
 	var td = document.createElement("td");
 	var text = document.createElement("textarea");
 	text.setAttribute("min-width",width);
@@ -347,6 +410,9 @@ function createTXTArea(code,width,cols){
 	text.setAttribute("cols",cols);
 	text.setAttribute("id",code);
 	td.appendChild(text);
+	if(cell==11){
+		text.value = data;
+	}
 	return td;
 }
 

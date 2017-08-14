@@ -1,4 +1,0 @@
-Old_attr,New_attr,Format,Missing Timestamp,Subject Ref.,Pseudonymization,Type,Unit,Range,Function
-"var 3","var A",,,,,none,,"abs(cast(_mipmap_function_  as float))+14"
-"var 3","var V",,,,,none,,"case when _mipmap_function_  then 'YES' else 'NO' end"
-

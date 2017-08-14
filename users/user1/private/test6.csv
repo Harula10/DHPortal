@@ -1,0 +1,6 @@
+Old_attr,New_attr,Format,Missing Timestamp,Subject Ref.,Pseudonymization,Type,Unit,Range,Function, Transformed_Function
+"var 35","var 19","NA","NA","NA",,,"NA","NA","abs(10)-8","abs(cast(10 as float))-8"
+"var 0","var 18","NA",,"NA",,"Polynominal","NA",,"contains(str, 'lala')","_mipmap_function_  like '%'lala'%'"
+"var 1","var 17",,"NA",,"NA","Real",,"NA","isNull(var17)","_mipmap_function_  is null"
+"var 3","var A","NA",,"NA",,"Polynominal","NA",,"append('ha', str2)","'ha'||_mipmap_function_ "
+

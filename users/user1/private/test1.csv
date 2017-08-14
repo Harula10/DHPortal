@@ -1,4 +1,0 @@
-Old_attr,New_attr,Format,Missing Timestamp,Subject Ref.,Pseudonymization,Type,Unit,Range,Function
-"var 3","var 20","","","","","","","","abs(cast(_mipmap_function_  as float))-3"
-"var 0","var 19","","","","","","","","'hello'||_mipmap_function_ "
-

@@ -32,8 +32,9 @@ function saveV(){
 				}
 			}
 			localStorage.variables = JSON.stringify(vars);
-			if(highlighted.group.trim()!=""){
+			if(highlighted.group.trim()==""){
 				alert("Add the variable in a new group!");
+			}else{
 				var e = document.querySelector("#select2");
 				highlighted.group = e.options[e.selectedIndex].text;
 			}
