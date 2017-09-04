@@ -1,4 +1,5 @@
 var to_match;
+
 window.onload = function(){	
 	initializeSVG(480);
 	var y = document.querySelectorAll(".navlink");

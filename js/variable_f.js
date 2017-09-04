@@ -109,8 +109,11 @@ function saveV(){
 		tr.appendChild(td);
 		tr.addEventListener("click",fillformV);
 		table.appendChild(tr);
-	
-		var vars = JSON.parse(localStorage.variables);
+		
+		if(localStorage.variables)
+			var vars = JSON.parse(localStorage.variables);
+		else
+			var vars = [];
 		vars.push(variable);
 		localStorage.variables = JSON.stringify(vars);
 		
@@ -149,12 +152,12 @@ function deleteV(){
 		
 		//delete from localstorage too
 		var vars = JSON.parse(localStorage.variables);
-			for(var i = 0; i < vars.length; i++){
-				if(vars[i].code == highlighted.code){
-					vars.splice(i,1);
-					break;
-				}
+		for(var i = 0; i < vars.length; i++){
+			if(vars[i].code == highlighted.code){
+				vars.splice(i,1);
+				break;
 			}
+		}
 		localStorage.variables = JSON.stringify(vars);
 		
 		var group = search(JSONobj,highlighted.group,false);
@@ -170,13 +173,14 @@ function deleteV(){
 			}
 		}else{
 			for(var i = 0; i<JSONobj.length; i++){
-				if(JSON.stringify(JSONobj[i]) === JSON.stringify(highlighted) ){
+				if(JSON.stringify(JSONobj[i].code) === JSON.stringify(highlighted.code)){
 					JSONobj.splice(i,1);
 					break;
 				}
 			}
 		}
 	}
+	
 	draw();
 	flagV=false;
 }

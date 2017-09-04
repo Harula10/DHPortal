@@ -56,7 +56,7 @@ function changeAttrG(){
 
 function deleteG(){
 	if (confirm("Are you sure you want to delete this group?")) {
-		codes.splice(codes.indexOf(selected.label), 1);
+		codes.splice(codes.indexOf(selected.code), 1);
 		var found = search(JSONobj,selected,true);
 		if(found){
 			for(var i = 0; i < found.children.length;i++){
@@ -80,6 +80,9 @@ function deleteG(){
 		delete_option("select",selected.label);
 		delete_option("select2",selected.label);
 		document.getElementById("formG").reset();	
+		flagG = false;
+		document.querySelector("#saveG").disabled = false;
+		document.querySelector("#delG").disabled = true;
 		draw();
 	}
 }
@@ -262,6 +265,7 @@ function saveG(){
 				"description" : groups[3].value,
 				"children" : [{}]
 			};
+			
 			if(groups[2].value == "None"){
 				JSONobj.push(node);	
 			}else{
@@ -288,6 +292,8 @@ function draw(){
 	var str = localStorage.JSONobj;
 	var new_str = "{ \"label\": \"None\", \"children\":" + str +"}";
 	var json = JSON.parse(new_str);
+	
+	if(localStorage.JSONobj == "[]") return;
 	
 	svg.selectAll("circle").remove();
 	svg.selectAll("text").remove();
@@ -328,6 +334,8 @@ function draw(){
 				return d.label;
 			})
 			.on("click", function(d) {
+				//svg.selectAll("circle").style("stroke", "gray");
+				//d3.select(this).style("stroke", "black")
 				if (focus !== d){	
 					if(d.data.type){ 
 						if(diameter==620){
@@ -362,7 +370,7 @@ function draw(){
 			.style("fill-opacity", function(d) {
 				return d.parent === json ? 1 : 0;
 			})
-			.style("font-size", "15px")
+			.style("font-size", "20px")
 			.text(function(d) {
 				return d.data.label ? d.data.label : "Empty Group";
 			});

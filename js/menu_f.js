@@ -1,6 +1,6 @@
 var rows;
 var vars;
-var user_vars;
+
 window.onload = function(){	
 	var x = document.querySelectorAll(".field_buttons");
 	x[0].addEventListener("click",resetG);
@@ -67,7 +67,7 @@ function downloadCSV(event){
 				line += vars[i][index];
 			}
 		}
-		str += line + '\r\n';
+		str += line + '\n';
 	}
 	var data = "text/csv;charset=utf-8," + encodeURIComponent(str);
 	event.target.href = 'data:' + data;
@@ -197,7 +197,10 @@ function getFile(id){
 }
 
 function readCSV(classname){
-	for (var i = 1; i < rows.length-1; i++) {
+	for (var i = 1; i < rows.length; i++) {
+		if(rows[i]==""){
+			break;
+		}
 		var cells = rows[i].split(",");
 		if(cells[2].trim()!="Polynominal" && cells[2].trim()!="Binominal" && cells[2].trim()!="Real" ){
 			alert("Please, upload a valid CSV!");
@@ -218,6 +221,10 @@ function readCSV(classname){
 
 function var_push(data,id){
 	var f = true;
+	if(localStorage.variables)
+		var vars = JSON.parse(localStorage.variables);
+	else
+		var vars = [];
 	for (var i = 0; i < vars.length; i++) { //if a variable already exists
 		if (vars[i].code == data.code && vars[i].group == data.group ) { //don't add it in array
 			f = false;
