@@ -1,5 +1,6 @@
 function register(){
 	var data = document.getElementsByClassName("data");
+	var _default = 0; //rights
 	if (data[0].value == "" ||data[1].value == "" || data[2].value=="") {
         alert("You have to complete all the fields!");
 		return;
@@ -16,12 +17,13 @@ function register(){
 				}
 			}
 		}
-		xmlhttp.open("GET","php_files/data_handling/users_handler.php?action=insert&username="+data[0].value+"&email="+data[1].value+"&password="+data[2].value,true);
+		xmlhttp.open("GET","php_files/data_handling/users_handler.php?action=insert&username="+data[0].value+"&email="+data[1].value+"&password="+data[2].value+"&rights="+_default,true);
 		xmlhttp.send();
 	}
 }
 
 function login(){
+	var _default = 0; //rights
 	var data = document.getElementsByClassName("data");
 	if (data[0].value == "" ||data[1].value == "" || data[2].value=="") {
         alert("Insert an email or a password!");
@@ -37,7 +39,7 @@ function login(){
 				}
 			}
 		}
-		xmlhttp.open("GET","php_files/data_handling/users_handler.php?action=session&username="+data[0].value+"&email="+data[1].value+"&password="+data[2].value,true);
+		xmlhttp.open("GET","php_files/data_handling/users_handler.php?action=session&username="+data[0].value+"&email="+data[1].value+"&password="+data[2].value+"&rights="+_default,true);
 		xmlhttp.send();
 	}
 }

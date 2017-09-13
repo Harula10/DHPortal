@@ -266,7 +266,7 @@ function saveG(){
 				"children" : [{}]
 			};
 			
-			if(groups[2].value == "None"){
+			if(groups[2].value == "Root"){
 				JSONobj.push(node);	
 			}else{
 				var found = search(JSONobj,node,true);
@@ -290,7 +290,7 @@ var text;
 function draw(){
 	localStorage.JSONobj =  JSON.stringify(JSONobj);
 	var str = localStorage.JSONobj;
-	var new_str = "{ \"label\": \"None\", \"children\":" + str +"}";
+	var new_str = "{ \"label\": \"Root\", \"children\":" + str +"}";
 	var json = JSON.parse(new_str);
 	
 	if(localStorage.JSONobj == "[]") return;

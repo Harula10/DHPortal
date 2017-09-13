@@ -93,7 +93,7 @@
 					<legend><strong>Selected Group</strong></legend>
 					Code<font color="red"><b>*</b></font>: <input class="groups requiredField" type="text"><br><br>
 					Label<font color="red"><b>*</b></font>: <input class="groups requiredField" type="text"><br><br>
-					Parent: <select  id="select" class="groups"><option value="None">None</option></select><br><br>
+					Parent: <select  id="select" class="groups"><option value="Root">Root</option></select><br><br>
 					Description: <textarea rows="5"  class="groups"></textarea><br><br><br><br><br><br><br>
 					<button class="field_buttons" id="resG" type="button">Reset</button>
 					<button class="field_buttons" id="delG" type="button" disabled>Delete</button>
@@ -113,7 +113,7 @@
 							<option value="Binominal">Binominal</option>
 							<option value="Real">Real</option>
 						  </select><br><br>
-					Group: <select id="select2" class="vars"><option value="None">None</option></select><br><br>
+					Group: <select id="select2" class="vars"><option value="Root">Root</option></select><br><br>
 					Description: <textarea rows="5" class="vars"></textarea><br><br><br><br><br><br>
 					Methodology: <input class="vars" type="text"><br><br><br>
 					<button class="field_buttons" id="resV" type="button">Reset</button>

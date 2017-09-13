@@ -3,6 +3,7 @@
 	$username = $_GET['username'];
 	$email = $_GET['email'];
 	$password = $_GET['password'];
+	$rights = $_GET['rights'];
 	
 	session_start();
 	include("database_handler.php");
@@ -17,13 +18,12 @@
 			$sql="SELECT * FROM users WHERE email='".$email."';";
 			$obj = $db->fetch_obj($sql);
 			if($obj==NULL){
-				$sql="INSERT INTO users(username,email,password) VALUES ('".$username."','".$email."','".$password."');";
+				$sql="INSERT INTO users(username,email,password,rights) VALUES ('".$username."','".$email."','".$password."','".$rights."');";
 				$result = mysqli_query($conn,$sql);
 				//create user folders in server
 				mkdir("../../users/".$username, 0777, true);
 				mkdir("../../users/".$username."/public", 0777, true);
 				mkdir("../../users/".$username."/private", 0777, true);
-				mkdir("../../users/".$username."/temp", 0777, true);
 				
 				//start a session
 				$_SESSION['logged_user'] = "$username";

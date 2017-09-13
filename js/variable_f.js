@@ -39,7 +39,7 @@ function saveV(){
 				highlighted.group = e.options[e.selectedIndex].text;
 			}
 			//delete the old var from group
-			if(highlighted.group=="None"){
+			if(highlighted.group=="Root"){
 				for(var i = 0; i<JSONobj.length; i++){
 					if(JSONobj[i].code == highlighted.code ){
 						JSONobj.splice(i,1);
