@@ -202,8 +202,12 @@ function readCSV(classname){
 			break;
 		}
 		var cells = rows[i].split(",");
+		if(cells[2]===undefined){
+			alert("The fields of the CSV should contain a comma as a delimeter!");
+			return;
+		}
 		if(cells[2].trim()!="Polynominal" && cells[2].trim()!="Binominal" && cells[2].trim()!="Real" ){
-			alert("Please, upload a valid CSV!");
+			alert("Please, upload a CSV with the required fields!");
 			return;
 		}					
 		var variable = {

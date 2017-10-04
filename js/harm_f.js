@@ -213,6 +213,10 @@ function readCSV(){
 	}
 	for (var i = 1; i < rows.length-1; i++) {
 		cells = rows[i].split(delim);
+		if(cells[2]===undefined){
+			alert("The fields of the CSV should contain a comma as a delimeter!");
+			return;
+		}
 		if(cells.length==5){
 			if(cells[2].trim()!="Polynominal" && cells[2].trim()!="Binominal" && cells[2].trim()!="Real" && cells[2].trim()!="Integer"){
 				alert("Please, upload a valid CSV!");
