@@ -33,7 +33,7 @@ window.onload = function(){
 	if(localStorage.csv){
 		rows = localStorage.csv.split("\n");
 		to_match = [];
-		readCSV();
+		readHCSV();
 		localStorage.removeItem("csv");
 	}
 }
@@ -175,7 +175,7 @@ function chooseFile(path){
 			if(path.includes(".csv")){
 				//split each row of csv file
 				rows = allText.split("\n");
-				readCSV();
+				readHCSV();
 			}else{
 				alert("Wrong type!");
 			}
@@ -191,29 +191,21 @@ function getFile(){
 	var fr = new FileReader();
 	fr.onload = function() { 
 		rows = fr.result.split("\n");
-		readCSV();
+		readHCSV();
 	}
 	fr.readAsText(files.item(0));
 }
 
-function readCSV(){
-	var cells;
+function readHCSV(){
 	var delim;
 	if(rows[0].indexOf('Methodology') !== -1){ //if it has a methodology field then it is a var csv
 		delim = /,/g;
-	}else{ //else it is a harmonized one
-		if(rows[0].indexOf(';') !== -1){
-			delim = /;(?="|,)/g;
-		}else if(rows[0].indexOf(',') !== -1){
-			delim = /,(?="|,)/g;
-		}else{
-			alert("The valid delimiters of the csv are ; or ,");
-			return;
-		}
+	}else{
+		delim = /,(?="|,)/g;
 	}
 	for (var i = 1; i < rows.length-1; i++) {
-		cells = rows[i].split(delim);
-		if(cells[2]===undefined){
+		var cells = rows[i].split(delim);
+		if(cells[2]==null){
 			alert("The fields of the CSV should contain a comma as a delimeter!");
 			return;
 		}

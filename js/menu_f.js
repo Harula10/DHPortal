@@ -202,7 +202,7 @@ function readCSV(classname){
 			break;
 		}
 		var cells = rows[i].split(",");
-		if(cells[2]===undefined){
+		if(cells[2]==null){
 			alert("The fields of the CSV should contain a comma as a delimeter!");
 			return;
 		}

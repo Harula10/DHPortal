@@ -35,9 +35,8 @@
 	echo $csv;
 
 	function check($parameter){
-		//strpos($parameter, "'") === false
-	    if (!is_string($parameter)) { 
-			if (!is_numeric($parameter) & $parameter!='true' & $parameter!='false') { 
+	    if (strpos($parameter, "'") === false) { 
+			if (!is_numeric($parameter) && $parameter!='true' && $parameter!='false') { 
 				$parameter = "_mipmap_function_ "; 
 			}
 	    }

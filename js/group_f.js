@@ -56,13 +56,16 @@ function changeAttrG(){
 
 function deleteG(){
 	if (confirm("Are you sure you want to delete this group?")) {
-		codes.splice(codes.indexOf(selected.code), 1);
+		codes.splice(codes.indexOf(selected.code), 1); //delete the code from the array of codes
 		var found = search(JSONobj,selected,true);
 		if(found){
 			for(var i = 0; i < found.children.length;i++){
 				if(found.children[i].code == selected.code){ //we found the child we should delete;
 					hasgroupchild(found.children[i].children,selected);
 					found.children.splice(i, 1);
+					if(JSON.stringify(found.children, null, ' ')=="[]")
+						found.children.push("{}");
+					
 					break;
 				}
 			}
@@ -95,7 +98,8 @@ function clearTable(label){
 			table[i].cells[3].innerHTML = "";
 		}
 	}
-	update(label,"", "ungrouped");
+	if(localStorage.variables)
+		update(label,"", "ungrouped");
 }
 
 function hasgroupchild(json,selected){
@@ -146,7 +150,7 @@ function editG(){
 	if(!found){ //if the parent is the root
 		for(var i = 0; i < JSONobj.length;i++){
 			if(JSONobj[i].code == selected.code){ //we found the child we should delete
-				if(JSONobj[i].parent == node.parent){
+				if(JSONobj[i].parent == node.parent){ //if you haven't transferred the group into another group
 					JSONobj[i].code = node.code;
 					JSONobj[i].label = node.label;
 					JSONobj[i].description = node.description;
@@ -165,9 +169,10 @@ function editG(){
 					node.children = old.slice();
 					JSONobj.splice(i, 1);
 					found = search(JSONobj,node,true); //search the new parent and insert the edited node
-					found.children.push(node);
 					if(JSON.stringify(found.children[0], null, ' ')=="{}")
 						found.children.splice(0, 1);
+					found.children.push(node);
+					
 				}
 				break;
 			}
@@ -191,6 +196,9 @@ function editG(){
 					found.children.splice(i, 1);
 					var par = search(JSONobj,node,true); //search the new parent and insert the edited node
 					if(par){
+						if(JSON.stringify(par.children)=="[{}]")
+							par.children.splice(0, 1);
+						alert(JSON.stringify(par));
 						par.children.push(node);
 					}else{
 						JSONobj.push(node);
