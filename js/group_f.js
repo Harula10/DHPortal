@@ -173,7 +173,6 @@ function editG(){
 					found.children.push(node);
 					
 				}
-				alert("1. "+JSON.stringify(node));
 				break;
 			}
 		}
@@ -206,12 +205,10 @@ function editG(){
 						JSONobj.push(node);
 					}
 				}
-				alert("2. "+JSON.stringify(node));
 				break;
 			}
 		}
 	}
-	console.log(localStorage.JSONobj);
 	//edit the group from the variables too
 	if(selected.label!=groups[1].value){
 		var table = document.getElementById("table");
