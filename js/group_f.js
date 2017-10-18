@@ -64,7 +64,7 @@ function deleteG(){
 					hasgroupchild(found.children[i].children,selected);
 					found.children.splice(i, 1);
 					if(JSON.stringify(found.children, null, ' ')=="[]")
-						found.children.push("{}");
+						found.children.push({});
 					
 					break;
 				}
@@ -74,8 +74,10 @@ function deleteG(){
 				if(JSONobj[i].code == selected.code){ //we found the child we should delete
 					//if that child has a group child then....
 					hasgroupchild(JSONobj[i].children,selected);
-					alert(localStorage.JSONobj);
 					JSONobj.splice(i, 1);
+					if(JSON.stringify(JSONobj)=="[]")
+						JSONobj.push({});
+					//alert();
 					break;
 				}
 			}

@@ -89,6 +89,8 @@ function saveV(){
 					group.children.splice(0, 1);
 				group.children.push(variable);
 			}else{
+				if(JSON.stringify(JSONobj)=="[{}]")
+					JSONobj.splice(0, 1);
 				JSONobj.push(variable);
 			}
 			localStorage.JSONobj = JSON.stringify(JSONobj);
