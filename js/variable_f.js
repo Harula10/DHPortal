@@ -32,12 +32,7 @@ function saveV(){
 				}
 			}
 			localStorage.variables = JSON.stringify(vars);
-			if(highlighted.group.trim()==""){
-				alert("Add the variable in a new group!");
-			}else{
-				var e = document.querySelector("#select2");
-				highlighted.group = e.options[e.selectedIndex].text;
-			}
+			
 			//delete the old var from group
 			if(highlighted.group=="Root"){
 				for(var i = 0; i<JSONobj.length; i++){

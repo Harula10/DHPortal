@@ -74,6 +74,7 @@ function deleteG(){
 				if(JSONobj[i].code == selected.code){ //we found the child we should delete
 					//if that child has a group child then....
 					hasgroupchild(JSONobj[i].children,selected);
+					alert(localStorage.JSONobj);
 					JSONobj.splice(i, 1);
 					break;
 				}
@@ -163,9 +164,7 @@ function editG(){
 				}else{
 					node.children = [];
 					old = JSONobj[i].children.slice();
-					for(var j = 0; j < old.length;j++){
-						old[j].group = node.label;
-					}
+					
 					node.children = old.slice();
 					JSONobj.splice(i, 1);
 					found = search(JSONobj,node,true); //search the new parent and insert the edited node
@@ -174,6 +173,7 @@ function editG(){
 					found.children.push(node);
 					
 				}
+				alert("1. "+JSON.stringify(node));
 				break;
 			}
 		}
@@ -194,21 +194,24 @@ function editG(){
 					//create a child for the new node
 					node.children = found.children[i].children.slice(); //copy the old node's children and add them to the new one
 					found.children.splice(i, 1);
+					if(JSON.stringify(found.children)=="[]")
+						found.children.push({});
+					
 					var par = search(JSONobj,node,true); //search the new parent and insert the edited node
 					if(par){
 						if(JSON.stringify(par.children)=="[{}]")
 							par.children.splice(0, 1);
-						alert(JSON.stringify(par));
 						par.children.push(node);
 					}else{
 						JSONobj.push(node);
 					}
 				}
-				console.log(JSONobj);
+				alert("2. "+JSON.stringify(node));
 				break;
 			}
 		}
 	}
+	console.log(localStorage.JSONobj);
 	//edit the group from the variables too
 	if(selected.label!=groups[1].value){
 		var table = document.getElementById("table");
@@ -278,10 +281,10 @@ function saveG(){
 				JSONobj.push(node);	
 			}else{
 				var found = search(JSONobj,node,true);
-				found.children.push(node);
-				if(JSON.stringify(found.children[0], null, ' ')=="{}"){
+				if(JSON.stringify(found.children)=="[{}]"){
 					found.children.splice(0, 1);
 				}
+				found.children.push(node);
 			}
 		}
 	}
