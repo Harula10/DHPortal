@@ -113,7 +113,7 @@ function chooseFFile(path){ //../users/user2/public/meta-dataaaa.json
 				window.location.href = "home.php";
 			}else if(path.includes(".csv")){
 				localStorage.csv = allText;
-				if(confirm("Add these data to Harmonization Page?")){
+				if(confirm("Add these data to Harmonization Page?\n(Press Cancel to load the variables at your Home Page)")){
 					//split each row of csv file
 					window.location.href = "harmonization.php";
 				}else{
