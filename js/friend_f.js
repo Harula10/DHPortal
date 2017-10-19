@@ -113,12 +113,23 @@ function chooseFFile(path){ //../users/user2/public/meta-dataaaa.json
 				window.location.href = "home.php";
 			}else if(path.includes(".csv")){
 				localStorage.csv = allText;
-				if(confirm("Add these data to Harmonization Page?\n(Press Cancel to load the variables at your Home Page)")){
+				if(confirm("Add these data to the Harmonization Page?")){
+					//split each row of csv file
+					window.location.href = "harmonization.php";
+				}else{
+					if(confirm("Add these data to the Home Page?")){
+						//split each row of csv file
+						window.location.href = "home.php";
+					}else{
+						return;
+					}
+				}
+				/*if(confirm("Add these data to Harmonization Page?\n(Press Cancel to load the variables at your Home Page)")){
 					//split each row of csv file
 					window.location.href = "harmonization.php";
 				}else{
 					window.location.href = "home.php";
-				}
+				}*/
 			}else{
 				alert("Wrong type!");
 				return;
