@@ -16,8 +16,9 @@
 				$j++;
 			}
 			if(strpos($del[$i], "(") === false){ //if the parameter is not a function then:
-				if (strpos($del[$i], "'") === false && $del[$i]!='true' && $del[$i]!='false') { //if the parameter is not a string or a boolean
-					$csv = $csv . "_mipmap_function_ "; //placeholder
+				if (strpos($del[$i], "'") === false & $del[$i]!='true' & $del[$i]!='false') { //if the parameter is not a string or a boolean
+					if(trim($del[$i])!='') $csv = $csv . "_mipmap_function_"; //placeholder
+					else $csv = $csv."";
 				}else{
 					$csv = $csv . $del[$i];
 				}
@@ -35,24 +36,28 @@
 	echo $csv;
 
 	function check($parameter){
-	    if (strpos($parameter, "'") === false) { 
-			if (!is_numeric($parameter) && $parameter!='true' && $parameter!='false') { 
-				$parameter = "_mipmap_function_ "; 
-			}
+	    if(!preg_match("/.+\s.+/",$parameter)){
+	        if (strpos($parameter, "'") === false) { 
+    			if (!is_numeric($parameter) & $parameter!='true' & $parameter!='false' & $parameter!='null') { 
+    				$parameter = "_mipmap_function_ "; 
+    			}
+	        }
 	    }
 	    return $parameter;
 	}
 	
 	function replaceVar($parameter){
-	    if(preg_match("(=|>|<|<=|>=|!=)",$parameter)){
-		    $s = null;
-            preg_match_all("/(=|>|<|<=|>=|!=).*/", $parameter, $s, PREG_SET_ORDER, 0);
-            $meta = $s[0][0];
-			$str = preg_replace("/(?<=\)).*/","", $parameter);
-			$parameter = check($str).$meta;
-		}else{
-		    $parameter = check($parameter);
-		}
+	    if(!preg_match("/.+\s.+/",$parameter)){
+    	    if(preg_match("(=|>|<|<=|>=|!=)",$parameter)){
+    		    $s = null;
+                preg_match_all("/(=|>|<|<=|>=|!=).*/", $parameter, $s, PREG_SET_ORDER, 0);
+                $meta = $s[0][0];
+    			$str = preg_replace("/(?<=\)).*/","", $parameter);
+    			$parameter = check($str).$meta;
+    		}else{
+    		    $parameter = check($parameter);
+    		}
+	    }
 		return $parameter;
 	}
 	
@@ -68,8 +73,9 @@
 		    $result = substr($result,1);
     	}
     	$parameters = preg_split('/,(?![^()]*(?:\([^()]*\))?\))/', $result);
-    	
+    	//var_dump($parameters);
     	for($i = 0; $i < count($parameters); $i++){
+    	    //echo "1 ".$parameters[$i]."\n";
 			if(preg_match("/.*\(.*\)/",$parameters[$i])){
 				$meta = "";
 				if(preg_match("(==|>|<|<=|>=|!=)",$parameters[$i])){
@@ -78,11 +84,14 @@
     	            $meta = $s[0][0];
 					$parameters[$i] = preg_replace("/(?<=\)).*/","", $parameters[$i]);
 				}
-				$parameters[$i] = splitExpression($parameters[$i]).$meta;
-				//echo $parameters[$i]."\n";
+				//echo "3 ".$parameters[$i]."\n";
+				if($parameters[$i]!="")
+				    $parameters[$i] = splitExpression($parameters[$i]).$meta;
+				//echo "4 ".$parameters[$i]."\n";
 			}
 	    }
-			
+		// echo "2 ".$f."\n";
+		//var_dump($parameters);
 	    return replaceFunctionText($f,$parameters);
 	}
 	
@@ -92,7 +101,7 @@
 		$POSTGRES_CURRENT_YEAR_FUNCTION = "extract(year from current_date)";
 		$output = "";
 		
-		switch ($functionName) {
+		switch (trim($functionName)) {
 			case "abs":
 				$output = "abs(cast(" .replaceVar($parameters[0]). " as float))";
 				break;
