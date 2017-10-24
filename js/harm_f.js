@@ -41,9 +41,10 @@ window.onload = function(){
 function downloadCSV(event){
 	if(checkQuotation()){
 		var filename = prompt("Save as...");
+		if(filename==null) return;
 		var data = "text/csv;charset=utf-8," + encodeURIComponent(CSVtobeTransformed().trim().replace(/<br>/g, "\n"));
 		event.target.href = 'data:' + data;
-		event.target.download = filename;
+		event.target.download = filename+".csv";
 	}else{
 		alert("The fields should include single quotation only.");
 		return;
@@ -204,8 +205,9 @@ function readHCSV(){
 		delim = /,(?="|,)/g;
 	}
 	for (var i = 1; i < rows.length-1; i++) {
+		if(rows[i]=="") break;
 		var cells = rows[i].split(delim);
-		if(cells[2]==null){
+		if(cells[1]==null){
 			alert("The fields of the CSV should contain a comma as a delimeter!");
 			return;
 		}
@@ -258,15 +260,19 @@ function load_options(){
 	//for each new variable set the options
 	var variable = document.getElementsByClassName("match-with");
 	for (var i = 0; i < variable.length; i++) {
-		if(localStorage.variables){
-			vars = [];
-			vars = JSON.parse(localStorage.variables);
-			for (var j = 0; j < vars.length; j++){
-				add_option(variable[i],vars[j].code);
+		if(localStorage.JSONobj){
+			if(localStorage.variables){
+				vars = [];
+				vars = JSON.parse(localStorage.variables);
+				for (var j = 0; j < vars.length; j++){
+					if(vars[j].code)
+						add_option(variable[i],vars[j].code);
+				}
 			}
 		}else{
 			for (var j = 0; j < to_match.length; j++){
-				add_option(variable[i],to_match[j].old);
+				if(to_match[j].old)
+					add_option(variable[i],to_match[j].old);
 			}
 		}
 	}
@@ -328,11 +334,13 @@ function initVar(data,cols){
 	option.innerHTML="Select none...";
 	select.appendChild(option);
 	if(cols==11){
-		var option = document.createElement("option");
-		option.setAttribute("value",data.old);
-		option.innerHTML = data.old;
-		select.appendChild(option);
-		select.value = data.old;
+		if(!localStorage.JSONobj){
+			var option = document.createElement("option");
+			option.setAttribute("value",data.old);
+			option.innerHTML = data.old;
+			select.appendChild(option);
+			select.value = data.old;
+		}
 	}
 	td.appendChild(select);
 	tr.appendChild(td);	
