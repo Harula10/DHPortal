@@ -21,10 +21,11 @@
 				$sql="INSERT INTO users(username,email,password,rights) VALUES ('".$username."','".$email."','".$password."','".$rights."');";
 				$result = mysqli_query($conn,$sql);
 				//create user folders in server
+				$old = umask(0);
 				mkdir("../../users/".$username, 0777, true);
 				mkdir("../../users/".$username."/public", 0777, true);
 				mkdir("../../users/".$username."/private", 0777, true);
-				
+				umask($old);
 				//start a session
 				$_SESSION['logged_user'] = "$username";
 				echo "You successfully signed up!";
