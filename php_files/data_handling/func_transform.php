@@ -38,7 +38,7 @@
 	function check($parameter){
 	    if(!preg_match("/.+\s.+/",$parameter)){
 	        if (strpos($parameter, "'") === false) { 
-    			if (!is_numeric($parameter) & $parameter!='true' & $parameter!='false' & $parameter!='null') { 
+    			if (!is_numeric($parameter) & $parameter!='true' & $parameter!='false' & $parameter!='null' & $parameter!='current_date') { 
     				$parameter = "_mipmap_function_ "; 
     			}
 	        }
@@ -140,7 +140,7 @@
 				$output = "cos(cast(" .replaceVar($parameters[0]). " as float))";
 				break;
 			case "cosh":
-				$output = "(exp(cast(" .replaceVar($parameters[0]). " as float))+exp(-cast(" .replaceVar($parameters[1]). " as float)))/2";
+				$output = "(exp(cast(" .replaceVar($parameters[0]). " as float))+exp(-cast(" .replaceVar($parameters[0]). " as float)))/2";
 				break;
 			case "currentYear":
 				$output = $POSTGRES_CURRENT_YEAR_FUNCTION;
