@@ -54,6 +54,22 @@
 					$db = new Database();
 					$db->setConn();
 					
+					$query = "SELECT * FROM friendships,users WHERE to_user='".$username."' AND rights = 0 AND friendships.from_user=users.username";
+					$result1 = $conn->query($query);
+					if($result1){
+						foreach($result1 as $row1) {
+							echo "<div><div onclick=\"friendsfiles('".$row1['from_user']."')\">".$row1['from_user']."<img src=\"../img/friend.ico\"></div><p id='unfriend' onclick=\"unfriend('".$row1['from_user']."',true)\">Unfriend</p></div>";
+						}
+					}
+					
+					$query2="SELECT username FROM users WHERE rights=1";
+					$result2 = $conn->query($query2);
+					foreach($result2 as $row2) {
+						echo "<div><div onclick=\"friendsfiles('".$row2['username']."')\">".$row2['username']."<img src=\"../img/friend.ico\"></div><p id='unfriend' onclick=\"unfriend('".$row2['username']."',true)\">Unfriend</p></div>";
+					}
+					
+					$db->closeConn();
+					/*
 					$query="SELECT * FROM friendships WHERE from_user='".$username."';";
 					$result = $conn->query($query);
 									
@@ -64,7 +80,7 @@
 							echo "<div><div onclick=\"friendsfiles('".$row2['from_user']."')\">".$row2['from_user']."<img src=\"../img/friend.ico\"></div><p id='unfriend' onclick=\"unfriend('".$row2['from_user']."',true)\">Unfriend</p></div>";
 						}
 					}
-					$db->closeConn();
+					$db->closeConn();*/
 				?>
 			</fieldset>
 		</div>   
