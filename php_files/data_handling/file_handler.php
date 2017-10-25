@@ -24,13 +24,13 @@
 		$query="SELECT * FROM users WHERE username='".$folder."';"; //checks if that user is an admin
 		$result=mysqli_query($conn,$query);
 		$obj=mysqli_fetch_object($result);
-		if($obj->rights==1){
+		/*if($obj->rights==1){
 			$path = "../users/".$folder."/private"; //$folder: 'friend_username'
 			$files = scandir("../".$path); //$files: the array with friend filename folders
 			for ($i = 2; $i < count($files); $i++) {
 			echo "<div onclick=\"chooseFFile('".$path."/".$files[$i]."')\"><img src=\"../img/file.png\">".$files[$i]."</div>";
 			}
-		}
+		}*/
 		$path = "../users/".$folder."/public"; //$folder: 'friend_username'
 		$files = scandir("../".$path); //$files: the array with friend filename folders
 		for ($i = 2; $i < count($files); $i++) {
